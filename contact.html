@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — SmithDev Labs</title>
+  <meta name="description" content="Book a free AI audit call with SmithDev Labs. We'll show you exactly what AI can do for your business — live on screen." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">SDL</div>
+        SmithDev Labs
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="about.html">About</a>
+        <a href="contact.html" class="active">Contact</a>
+        <a href="contact.html" class="btn btn-primary btn-sm nav-cta">Book Free Audit</a>
+      </div>
+      <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="section-label">Let's Talk</span>
+    <h1>Book a Free AI Audit</h1>
+    <p>Tell us about your business and we'll show you exactly what AI can do for you — live on a 15-minute Google Meet call. No pressure, no commitment.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- LEFT: INFO -->
+      <div class="fade-up">
+        <h3>What Happens on the Call?</h3>
+        <p>During your free 15-minute AI audit, we will:</p>
+
+        <div style="display:flex;flex-direction:column;gap:16px;margin:24px 0 40px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:.8rem;flex-shrink:0;">1</div>
+            <div>
+              <div style="font-weight:700;margin-bottom:4px;">Review Your Current Setup</div>
+              <p style="font-size:.875rem;color:var(--text-light);">We look at your website, Google presence, and how you currently handle leads.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:.8rem;flex-shrink:0;">2</div>
+            <div>
+              <div style="font-weight:700;margin-bottom:4px;">Show a Live Demo Built for You</div>
+              <p style="font-size:.875rem;color:var(--text-light);">We build a sample website and AI chatbot using your actual business name — you see real results in real time.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:.8rem;flex-shrink:0;">3</div>
+            <div>
+              <div style="font-weight:700;margin-bottom:4px;">Give You a Clear Recommendation</div>
+              <p style="font-size:.875rem;color:var(--text-light);">We tell you exactly what we'd build, how long it takes, and what it costs. No jargon — just a clear plan.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">📧</div>
+          <div>
+            <h4>Email Us</h4>
+            <p><a href="mailto:hello@smithdevlabs.com" style="color:var(--primary);">hello@smithdevlabs.com</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🌐</div>
+          <div>
+            <h4>Website</h4>
+            <p><a href="https://smithdevlabs.com" style="color:var(--primary);">smithdevlabs.com</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📅</div>
+          <div>
+            <h4>Response Time</h4>
+            <p>We reply within 2 business hours during business days</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(30,64,175,.05);border:1px solid rgba(30,64,175,.15);border-radius:var(--radius);padding:20px;margin-top:24px;">
+          <div style="font-weight:700;margin-bottom:8px;color:var(--primary);">💡 Pro Tip</div>
+          <p style="font-size:.875rem;color:var(--text-light);">When you submit this form, mention one specific challenge your business has — like "I miss calls after hours" or "I spend too much time following up with leads." It helps us prepare a demo tailored exactly to your situation.</p>
+        </div>
+      </div>
+
+      <!-- RIGHT: FORM -->
+      <div class="fade-up">
+        <div class="form-card">
+          <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:6px;">Get Your Free AI Audit</h3>
+          <p style="font-size:.875rem;color:var(--text-light);margin-bottom:28px;">Fill out the form below and we'll reach out within 2 hours to schedule your call.</p>
+
+          <div class="alert alert-success" id="formSuccess">
+            ✅ Message sent! We'll be in touch within 2 hours to schedule your free audit call.
+          </div>
+
+          <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="contactForm">
+            <input type="hidden" name="form-name" value="contact" />
+            <p style="display:none;"><input name="bot-field" /></p>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" name="firstName" placeholder="John" required />
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" name="lastName" placeholder="Smith" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input type="email" id="email" name="email" placeholder="john@yourbusiness.com" required />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" />
+            </div>
+
+            <div class="form-group">
+              <label for="business">Business Name *</label>
+              <input type="text" id="business" name="business" placeholder="Smith's Plumbing Co." required />
+            </div>
+
+            <div class="form-group">
+              <label for="service">What are you most interested in? *</label>
+              <select id="service" name="service" required>
+                <option value="" disabled selected>Select a service...</option>
+                <option value="website">Business Website</option>
+                <option value="chatbot">AI Chatbot</option>
+                <option value="automation">Business Automation</option>
+                <option value="ai-agent">AI Agent</option>
+                <option value="full-package">Full Package (Website + AI + Automation)</option>
+                <option value="not-sure">Not Sure — Need Advice</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="challenge">What's your biggest business challenge right now?</label>
+              <textarea id="challenge" name="challenge" placeholder="e.g. I miss calls after hours, I spend too much time on follow-ups, my website doesn't generate leads..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">
+              Book My Free AI Audit Call →
+            </button>
+
+            <p style="font-size:.75rem;color:var(--gray);text-align:center;margin-top:12px;">No spam. No long-term commitment. Just a genuine 15-minute conversation.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT TO EXPECT -->
+<section class="section" style="background:var(--light);">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-label">After You Submit</span>
+      <h2 class="section-title">What Happens Next</h2>
+    </div>
+    <div class="steps-grid" style="margin-top:48px;">
+      <div class="step fade-up">
+        <div class="step-num">1</div>
+        <h3>We Review Your Form</h3>
+        <p>Within 2 hours we review your submission and research your business to prepare a custom demo.</p>
+      </div>
+      <div class="step fade-up">
+        <div class="step-num">2</div>
+        <h3>We Schedule Your Call</h3>
+        <p>We reach out by email or phone to schedule your free 15-minute Google Meet audit call.</p>
+      </div>
+      <div class="step fade-up">
+        <div class="step-num">3</div>
+        <h3>Live Demo on the Call</h3>
+        <p>On the call we show you a working demo of your business — website, chatbot, or automation — built live.</p>
+      </div>
+      <div class="step fade-up">
+        <div class="step-num">4</div>
+        <h3>Get a Clear Plan</h3>
+        <p>You walk away with a clear picture of what we'd build, the timeline, and the exact cost. No pressure to proceed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container" style="position:relative;z-index:1;">
+    <h2>Prefer to Just Send an Email?</h2>
+    <p>No problem — reach us directly and we'll get back to you within 2 hours.</p>
+    <div class="cta-actions">
+      <a href="mailto:hello@smithdevlabs.com" class="btn btn-white btn-lg">📧 hello@smithdevlabs.com</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><div class="nav-logo-icon">SDL</div>SmithDev Labs</div>
+        <p>AI-powered websites, chatbots, and automation systems for small and medium businesses.</p>
+        <div class="social-links">
+          <a href="#" class="social-link">in</a>
+          <a href="#" class="social-link">fb</a>
+          <a href="#" class="social-link">𝕏</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a href="services.html">Business Websites</a></li><li><a href="services.html">AI Chatbots</a></li><li><a href="services.html">Automation Systems</a></li><li><a href="services.html">AI Agents</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About Us</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="mailto:hello@smithdevlabs.com">hello@smithdevlabs.com</a></li><li><a href="https://smithdevlabs.com">smithdevlabs.com</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmithDev Labs LLC. All rights reserved.</p>
+      <p>Built with AI · Powered by SmithDev Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="js/main.js"></script>
+</body>
+</html>

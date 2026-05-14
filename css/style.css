@@ -124,7 +124,7 @@ ul { list-style: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 80px;
+  height: 110px;
 }
 .nav-logo {
   display: flex;
@@ -135,7 +135,7 @@ ul { list-style: none; }
   color: var(--dark);
 }
 .nav-logo-img {
-  height: 60px;
+  height: 100px;
   width: auto;
   object-fit: contain;
   mix-blend-mode: multiply;
@@ -150,12 +150,12 @@ ul { list-style: none; }
   font-size: .9rem;
 }
 .footer-logo-img {
-  height: 56px;
+  height: 80px;
   width: auto;
   object-fit: contain;
   background: white;
-  border-radius: 10px;
-  padding: 6px 10px;
+  border-radius: 12px;
+  padding: 8px 12px;
 }
 .nav-links {
   display: flex;
@@ -177,7 +177,7 @@ ul { list-style: none; }
 
 /* ── HERO ───────────────────────────────────────────────── */
 .hero {
-  padding: 160px 0 100px;
+  padding: 190px 0 100px;
   background: linear-gradient(135deg, #f0f4ff 0%, #e8f2ff 50%, #f0f9ff 100%);
   position: relative;
   overflow: hidden;

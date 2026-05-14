@@ -8,7 +8,7 @@
 
 ## Live Site
 
-🌐 **[smithdevlabs.com](https://smithdevlabs.com)**
+🌐 **[smithdevlabs.com](github.com/MSMITH71910/smithdevlabs_prosite)**
 
 ---
 

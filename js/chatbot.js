@@ -6,8 +6,33 @@
   const KB = [
     {
       keys: ['hello', 'hi', 'hey', 'howdy', 'sup', 'good morning', 'good afternoon', 'good evening'],
-      reply: `Hey there! 👋 I'm Sam, the AI assistant for **SmithDev Labs**. I can answer questions about our services, pricing, and how we can help grow your business.\n\nWhat can I help you with today?`,
-      quick: ['Services & Pricing', 'How long does it take?', 'Book a Free Audit']
+      reply: `Hey there! 👋 I'm Sam, the AI assistant for **SmithDev Labs**. I can answer questions about our services, pricing, and the developer behind it all.\n\nWhat can I help you with today?`,
+      quick: ['Services & Pricing', 'About the Developer', 'Book a Free Audit']
+    },
+    {
+      keys: ['who built', 'who made', 'who created', 'developer', 'founder', 'michael', 'about michael', 'about you', 'who is', 'who are', 'tell me about the', 'meet the'],
+      reply: `Meet **Michael R. Smith** — the founder of SmithDev Labs LLC! 👨‍💻\n\nMichael is a versatile technologist based near **Philadelphia, PA** with a unique background that spans:\n\n🤖 AI/ML development & chatbot engineering\n🌐 Full-stack web development (React, Node.js, Django)\n📊 Business intelligence & data analytics\n🔧 IT support & computer forensics (8+ years)\n🏗️ Construction tech — bringing field experience to software\n\nHe has completed **12+ professional certifications** from Meta, Google, CompTIA, and Zero To Mastery.\n\nWant to know more about his skills, projects, or certifications?`,
+      quick: ['Skills & Tech Stack', 'Projects & Portfolio', 'Certifications', 'Book a Free Audit']
+    },
+    {
+      keys: ['skill', 'tech stack', 'tech', 'language', 'framework', 'python', 'react', 'node', 'what can you build', 'experience with'],
+      reply: `Michael brings a **broad and battle-tested skill set** to every project:\n\n**AI & Machine Learning:**\n• Python, TensorFlow, PyTorch\n• NLP & LLM fine-tuning\n• BCG GenAI simulation (financial chatbot)\n• CrewAI multi-agent systems\n\n**Full-Stack Web Development:**\n• React, Angular, TypeScript\n• Node.js, Django, Golang (basics)\n• C# / .NET / Blazor\n• Meta Front-End Developer Certified\n\n**Business Intelligence:**\n• Power BI, Tableau, Excel/VBA\n• Data pipelines & anonymization\n• Google Business Intelligence (in progress)\n\n**IT & Infrastructure:**\n• CompTIA A+ Certified\n• 8 years computer forensics\n• Linux / Windows sysadmin\n• Remote troubleshooting\n\nNeed something specific built? Let us know!`,
+      quick: ['Projects & Portfolio', 'Certifications', 'Book a Free Audit']
+    },
+    {
+      keys: ['project', 'portfolio', 'built before', 'past work', 'example', 'show me', 'github'],
+      reply: `Here are some of **Michael's standout projects** on GitHub:\n\n🏗️ **ConstructPro Manager** — Full ERP for construction companies (payroll, takeoff, estimating, blueprints)\n\n📈 **Real-Time Stock Predictor** — MLOps pipeline with automated retraining using PyTorch & Airflow\n\n🤖 **Fine-Tuned LLM Chatbot** — Financial Q&A bot pulling data from 10-K/10-Q SEC reports\n\n🎯 **AI Interview Coach** — Multi-agent coaching system using CrewAI & GPT-4\n\n📊 **Data Analyst Portfolio** — Concrete mix performance dashboards, Bigfoot sighting analysis & budget trackers\n\n🛍️ **Crwn Clothing** — Full e-commerce frontend in React & Firebase\n\n🎮 **Clips Gaming Platform** — Streaming-style platform built in Angular & TypeScript\n\n👉 See everything at **[github.com/MSMITH71910](https://github.com/MSMITH71910)**`,
+      quick: ['Skills & Tech Stack', 'Certifications', 'Book a Free Audit']
+    },
+    {
+      keys: ['certif', 'degree', 'education', 'credential', 'qualified', 'trained', 'background', 'comptia', 'meta', 'google'],
+      reply: `Michael has earned **12+ professional certifications** (2024–2026):\n\n🤖 Complete Machine Learning & Data Science — *Zero To Mastery*\n🐍 Complete Python Developer — *Zero To Mastery*\n🌐 Meta Front-End Developer Professional Certificate — *Meta/Coursera*\n🔧 C# / .NET Full-Stack Bootcamp — *ASP.NET Core & Blazor*\n☁️ DevOps Bootcamp: Linux SysAdmin — *Zero To Mastery*\n📊 Google Business Intelligence *(in progress)* — *Google/Coursera*\n🔧 CompTIA A+ — *CompTIA*\n🧠 BCG GenAI Job Simulation — *Forage*\n📊 Commonwealth Bank Data Science Simulation — *Forage*\n📈 Goldman Sachs Excel Skills Simulation — *Forage*\n🎨 3D Modeling with Blender — *Online*\n\nPlus **8 years** of hands-on computer forensics experience in the field.`,
+      quick: ['Skills & Tech Stack', 'Projects & Portfolio', 'Book a Free Audit']
+    },
+    {
+      keys: ['location', 'philadelphia', 'philly', 'where is michael', 'based', 'local', 'area', 'remote', 'nationwide'],
+      reply: `SmithDev Labs is **fully remote** — Michael is based near **Philadelphia, PA** but works with businesses anywhere in the US and beyond! 🌎\n\nAll project work, calls, and demos happen via Google Meet, Zoom, or email. No travel needed on your end.\n\nWant to jump on a quick call?`,
+      quick: ['Book a Free Audit', "What's the pricing?", 'What services do you offer?']
     },
     {
       keys: ['service', 'what do you do', 'offer', 'build', 'provide', 'specialize', 'help with'],

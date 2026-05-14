@@ -17,7 +17,7 @@
     {
       keys: ['price', 'pricing', 'cost', 'how much', 'rates', 'fee', 'charge', 'package', 'plan'],
       reply: `Here's a quick overview of our pricing:\n\n**One-Time Projects:**\n• Starter Website — **$800–$1,500**\n• Business Website + Chatbot — **$1,500–$3,000**\n• Full AI Automation Setup — **$2,500–$5,000**\n• Enterprise AI System — **$10,000+**\n\n**Monthly Retainers (ongoing support):**\n• Basic Care — **$300/mo**\n• Growth Plan — **$750/mo**\n• Full AI Partner — **$2,000/mo**\n\nEvery project starts with a **free 15-minute audit call** so we can give you an exact quote! 🎯`,
-      quick: ['Book a Free Audit', 'What's included?', 'How long does it take?']
+      quick: ['Book a Free Audit', "What's included?", 'How long does it take?']
     },
     {
       keys: ['website', 'web site', 'web design', 'landing page', 'webpage'],
@@ -27,52 +27,52 @@
     {
       keys: ['chatbot', 'chat bot', 'bot', 'assistant', 'ai chat', 'live chat', 'like you'],
       reply: `You're talking to one right now! 😄\n\nOur AI chatbots are custom-built for your business. They can:\n\n💬 Answer customer questions 24/7\n📋 Qualify leads automatically\n📅 Book appointments\n🔗 Connect to your CRM or email\n📣 Follow up with prospects\n\nMost clients see a **40–60% increase in captured leads** within the first 30 days.\n\nSetup starts at **$500** standalone, or bundled with a website from **$1,500**. Want us to build one live on a call so you can see it in action?`,
-      quick: ['Book a Free Audit', 'What's the pricing?', 'How long to set up?']
+      quick: ['Book a Free Audit', "What's the pricing?", 'How long to set up?']
     },
     {
       keys: ['automat', 'workflow', 'n8n', 'make.com', 'zapier', 'integration', 'connect', 'system'],
       reply: `Business automation is one of our specialties! We use tools like **Make.com**, **n8n**, and **Zapier** to connect your apps and eliminate repetitive work.\n\nExamples of what we automate:\n\n📥 Auto-send follow-up emails when a form is submitted\n📊 Sync leads from your website to your CRM\n🗓️ Auto-schedule appointments and send reminders\n📦 Order & invoice processing\n📱 Post to social media on a schedule\n\nMost automation projects run **$1,000–$3,000** one-time, and clients typically save **5–15 hours per week**.\n\nWant to talk through what we could automate for you?`,
-      quick: ['Book a Free Audit', 'What's the cost?', 'How long does it take?']
+      quick: ['Book a Free Audit', "What's the cost?", 'How long does it take?']
     },
     {
       keys: ['ai agent', 'agent', 'openai', 'gpt', 'artificial intelligence', 'generative', 'llm'],
       reply: `AI Agents are the next level — beyond a simple chatbot, they can **think, research, and take action**.\n\nHere's what an AI agent can do for your business:\n\n🔍 Research prospects and summarize findings\n✉️ Draft personalized emails and proposals\n📞 Qualify inbound leads and score them\n📝 Generate reports and content\n🔄 Run complex multi-step workflows automatically\n\nWe build agents using **OpenAI, Relevance AI, Voiceflow**, and custom APIs.\n\nPricing starts at **$2,500** depending on complexity. Want to see a demo?`,
-      quick: ['Book a Free Audit', 'What's the pricing?', 'Tell me about chatbots']
+      quick: ['Book a Free Audit', "What's the pricing?", 'Tell me about chatbots']
     },
     {
       keys: ['how long', 'timeline', 'turnaround', 'delivery', 'when', 'days', 'weeks', 'fast', 'quick'],
       reply: `We move fast! Here are our typical turnaround times:\n\n🌐 **Website** — 5–7 business days\n🤖 **Chatbot** — 2–3 business days\n⚙️ **Automation** — 3–7 business days\n🧠 **AI Agent** — 1–3 weeks depending on complexity\n\nEvery project includes revision rounds and a walkthrough call before delivery.\n\nNeed something faster? Let us know on the audit call and we'll do our best to accommodate! ⚡`,
-      quick: ['Book a Free Audit', 'What's the pricing?', 'What services do you offer?']
+      quick: ['Book a Free Audit', "What's the pricing?", 'What services do you offer?']
     },
     {
       keys: ['book', 'audit', 'call', 'meeting', 'demo', 'schedule', 'appointment', 'consult', 'talk', 'chat with'],
       reply: `Awesome — let's make it happen! 🎉\n\nOur **free 15-minute AI Audit call** is the perfect first step. Here's what happens:\n\n1️⃣ You tell us about your business\n2️⃣ We build a live demo using your actual business name\n3️⃣ We give you a clear plan and exact quote\n\nNo pressure, no commitment — just a clear picture of what's possible.\n\n👉 **[Click here to book your free audit](contact.html)**`,
-      quick: ['What services do you offer?', 'What's the pricing?']
+      quick: ['What services do you offer?', "What's the pricing?"]
     },
     {
       keys: ['contact', 'email', 'reach', 'get in touch', 'phone', 'number', 'message'],
       reply: `You can reach us directly here:\n\n📧 **Email:** msmith@smithdevlabs.com\n🌐 **Website:** smithdevlabs.com\n\nOr fill out the form on our **[Contact page](contact.html)** and we'll get back to you within a few hours.\n\nThe fastest way to get started is a **free 15-minute audit call** — we can show you a live demo of exactly what we'd build for you! 🚀`,
-      quick: ['Book a Free Audit', 'What's the pricing?']
+      quick: ['Book a Free Audit', "What's the pricing?"]
     },
     {
       keys: ['location', 'where', 'based', 'local', 'area', 'remote', 'online', 'nationwide'],
       reply: `SmithDev Labs is a **fully remote agency** — so we work with businesses anywhere in the US and beyond! 🌎\n\nAll our calls, demos, and project updates are done via Google Meet, Zoom, or email. Distance is never a barrier.\n\nWant to jump on a quick call?`,
-      quick: ['Book a Free Audit', 'What's the pricing?', 'What services do you offer?']
+      quick: ['Book a Free Audit', "What's the pricing?", 'What services do you offer?']
     },
     {
       keys: ['about', 'company', 'who are you', 'smithdev', 'michael', 'smith', 'llc', 'background', 'team', 'founder'],
       reply: `**SmithDev Labs LLC** is a boutique AI solutions agency helping small and medium businesses compete with bigger companies using the power of AI.\n\nWe specialize in making **AI practical and affordable** — not just a buzzword. Our founder has hands-on experience with:\n\n🤖 Building AI chatbots and agents\n🌐 Designing high-converting websites\n⚙️ Automating business workflows\n\nWe believe every small business deserves the same AI tools that Fortune 500 companies use — at a fraction of the cost.\n\nWant to see what we can do for you?`,
-      quick: ['Book a Free Audit', 'What services do you offer?', 'What's the pricing?']
+      quick: ['Book a Free Audit', 'What services do you offer?', "What's the pricing?"]
     },
     {
       keys: ['guarantee', 'refund', 'warranty', 'what if', 'risk', 'trial'],
       reply: `Great question — we stand behind our work. Here's our promise:\n\n✅ **Revision rounds included** — we keep refining until you're happy\n✅ **Clear scope upfront** — no surprise costs or scope creep\n✅ **Walkthrough call** before every delivery\n✅ **30-day support** included after launch\n\nWe don't get paid in full until you're satisfied with the direction. Your success is our reputation. 🤝`,
-      quick: ['Book a Free Audit', 'What's the pricing?']
+      quick: ['Book a Free Audit', "What's the pricing?"]
     },
     {
       keys: ['thank', 'thanks', 'awesome', 'great', 'perfect', 'amazing', 'helpful', 'love it'],
       reply: `You're welcome! 😊 That's what I'm here for.\n\nIf you're ready to take the next step, a **free 15-minute audit call** is the best way to get started — we'll show you a live demo built around your specific business.\n\nIs there anything else I can help you with?`,
-      quick: ['Book a Free Audit', 'What services do you offer?', 'What's the pricing?']
+      quick: ['Book a Free Audit', 'What services do you offer?', "What's the pricing?"]
     },
     {
       keys: ['bye', 'goodbye', 'see you', 'later', 'done', 'no thanks'],
@@ -90,7 +90,7 @@
     }
     return {
       reply: `That's a great question! I want to make sure I give you the right answer.\n\nThe best next step is a **free 15-minute call** with our founder — he can answer that directly and show you a live demo.\n\n👉 **[Book your free audit here](contact.html)**\n\nOr email us at **msmith@smithdevlabs.com** and we'll reply within a few hours!`,
-      quick: ['Book a Free Audit', 'What services do you offer?', 'What's the pricing?']
+      quick: ['Book a Free Audit', 'What services do you offer?', "What's the pricing?"]
     };
   }
 

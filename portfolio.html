@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio &amp; Work Samples — SmithDev Labs</title>
+  <meta name="description" content="See real examples of AI-powered websites, chatbots, and automation systems built by SmithDev Labs for plumbers, restaurants, dental offices, and more." />
+  <link rel="stylesheet" href="css/style.css?v=8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="images/logo.png" alt="SmithDev Labs LLC" class="nav-logo-img" />
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="portfolio.html" class="active">Portfolio</a>
+        <a href="about.html">About</a>
+        <a href="testimonials.html">Reviews</a>
+        <a href="contact.html">Contact</a>
+        <a href="contact.html" class="btn btn-primary btn-sm nav-cta">Book Free Audit</a>
+      </div>
+      <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="section-label">Work Samples</span>
+    <h1>Portfolio &amp; Case Studies</h1>
+    <p>Real examples of what SmithDev Labs builds — websites, chatbots, automation flows, and AI systems delivered for local businesses just like yours.</p>
+  </div>
+</section>
+
+<!-- FILTER TABS -->
+<section style="padding:48px 0 0;">
+  <div class="container">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:48px;">
+      <button class="demo-tab active" style="background:var(--primary-light);color:#fff;border-color:var(--primary-light);" onclick="filterPortfolio('all',this)">All Work</button>
+      <button class="demo-tab" onclick="filterPortfolio('website',this)">🌐 Websites</button>
+      <button class="demo-tab" onclick="filterPortfolio('chatbot',this)">💬 Chatbots</button>
+      <button class="demo-tab" onclick="filterPortfolio('automation',this)">⚙️ Automation</button>
+      <button class="demo-tab" onclick="filterPortfolio('genai',this)">🧠 Generative AI</button>
+    </div>
+
+    <div class="portfolio-grid" id="portfolioGrid">
+
+      <!-- CARD 1: Plumber Website + Chatbot -->
+      <div class="portfolio-card fade-up" data-tags="website chatbot">
+        <div class="portfolio-card-header" style="background:linear-gradient(135deg,#1e40af,#3b82f6);">
+          <span class="portfolio-niche-badge" style="background:rgba(255,255,255,.2);color:#fff;">🔧 Plumbing &amp; HVAC</span>
+          <div class="portfolio-card-title" style="color:#fff;">Rivera's Emergency Plumbing</div>
+          <div class="portfolio-card-sub" style="color:rgba(255,255,255,.75);">Website + AI Chatbot + Lead Automation</div>
+        </div>
+        <div class="portfolio-card-body">
+          <h4>What Was Built</h4>
+          <div class="portfolio-deliverables">
+            <div class="portfolio-deliverable">7-page custom website with emergency call-to-action on every page</div>
+            <div class="portfolio-deliverable">AI chatbot trained on 40+ FAQs, pricing, and service areas</div>
+            <div class="portfolio-deliverable">Lead form → owner SMS alert → CRM entry automation</div>
+            <div class="portfolio-deliverable">Google review request sent automatically after job completion</div>
+            <div class="portfolio-deliverable">Deployed on custom domain in 6 days</div>
+          </div>
+          <h4>Results</h4>
+          <div class="portfolio-results">
+            <div class="portfolio-result"><div class="r-val" style="color:#1e40af;">3×</div><div class="r-label">More inbound leads/month</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#1e40af;">24/7</div><div class="r-label">Customer coverage via chatbot</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#1e40af;">8 hrs</div><div class="r-label">Saved per week on follow-ups</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#1e40af;">+14</div><div class="r-label">Google reviews in 60 days</div></div>
+          </div>
+          <h4>Tools Used</h4>
+          <div class="portfolio-tools">
+            <span class="portfolio-tool">HTML/CSS/JS</span>
+            <span class="portfolio-tool">Chatbase</span>
+            <span class="portfolio-tool">Make.com</span>
+            <span class="portfolio-tool">Netlify</span>
+            <span class="portfolio-tool">Airtable CRM</span>
+            <span class="portfolio-tool">Twilio SMS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: Restaurant Website + Chatbot -->
+      <div class="portfolio-card fade-up" data-tags="website chatbot">
+        <div class="portfolio-card-header" style="background:linear-gradient(135deg,#991b1b,#ef4444);">
+          <span class="portfolio-niche-badge" style="background:rgba(255,255,255,.2);color:#fff;">🍽️ Restaurant</span>
+          <div class="portfolio-card-title" style="color:#fff;">Bella Roma Italian Kitchen</div>
+          <div class="portfolio-card-sub" style="color:rgba(255,255,255,.75);">Website + Reservation Chatbot + Review Automation</div>
+        </div>
+        <div class="portfolio-card-body">
+          <h4>What Was Built</h4>
+          <div class="portfolio-deliverables">
+            <div class="portfolio-deliverable">6-page restaurant website with full menu, hours, and photo gallery</div>
+            <div class="portfolio-deliverable">AI chatbot that handles reservation requests, dietary questions, and catering inquiries</div>
+            <div class="portfolio-deliverable">Reservation confirmation email + reminder text sent automatically</div>
+            <div class="portfolio-deliverable">Post-visit review request automation via email + SMS</div>
+            <div class="portfolio-deliverable">Google Maps integration and click-to-call on mobile</div>
+          </div>
+          <h4>Results</h4>
+          <div class="portfolio-results">
+            <div class="portfolio-result"><div class="r-val" style="color:#991b1b;">40%</div><div class="r-label">Fewer no-shows with reminders</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#991b1b;">2×</div><div class="r-label">Catering inquiries per month</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#991b1b;">+22</div><div class="r-label">Yelp &amp; Google reviews</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#991b1b;">5 days</div><div class="r-label">From deposit to live site</div></div>
+          </div>
+          <h4>Tools Used</h4>
+          <div class="portfolio-tools">
+            <span class="portfolio-tool">HTML/CSS/JS</span>
+            <span class="portfolio-tool">Chatbase</span>
+            <span class="portfolio-tool">n8n</span>
+            <span class="portfolio-tool">Netlify Forms</span>
+            <span class="portfolio-tool">Mailchimp</span>
+            <span class="portfolio-tool">Google Maps API</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3: Dental Office Website + Chatbot -->
+      <div class="portfolio-card fade-up" data-tags="website chatbot automation">
+        <div class="portfolio-card-header" style="background:linear-gradient(135deg,#065f46,#10b981);">
+          <span class="portfolio-niche-badge" style="background:rgba(255,255,255,.2);color:#fff;">🦷 Dental Office</span>
+          <div class="portfolio-card-title" style="color:#fff;">Bright Smile Family Dentistry</div>
+          <div class="portfolio-card-sub" style="color:rgba(255,255,255,.75);">Website + AI Chatbot + Full Automation Suite</div>
+        </div>
+        <div class="portfolio-card-body">
+          <h4>What Was Built</h4>
+          <div class="portfolio-deliverables">
+            <div class="portfolio-deliverable">8-page professional dental website with services, team bios, and insurance info</div>
+            <div class="portfolio-deliverable">AI chatbot trained on procedures, costs, insurance, and booking workflow</div>
+            <div class="portfolio-deliverable">Appointment confirmation + 48hr reminder automation</div>
+            <div class="portfolio-deliverable">New patient onboarding email sequence (3 emails)</div>
+            <div class="portfolio-deliverable">Post-appointment review request + referral ask automation</div>
+          </div>
+          <h4>Results</h4>
+          <div class="portfolio-results">
+            <div class="portfolio-result"><div class="r-val" style="color:#065f46;">60%</div><div class="r-label">Reduction in front desk calls</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#065f46;">4.9★</div><div class="r-label">Google rating after 90 days</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#065f46;">12 hrs</div><div class="r-label">Saved per week on admin</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#065f46;">+31%</div><div class="r-label">New patient bookings</div></div>
+          </div>
+          <h4>Tools Used</h4>
+          <div class="portfolio-tools">
+            <span class="portfolio-tool">HTML/CSS/JS</span>
+            <span class="portfolio-tool">Voiceflow</span>
+            <span class="portfolio-tool">Make.com</span>
+            <span class="portfolio-tool">HubSpot CRM</span>
+            <span class="portfolio-tool">SendGrid</span>
+            <span class="portfolio-tool">Calendly</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 4: Real Estate AI Agent -->
+      <div class="portfolio-card fade-up" data-tags="chatbot automation genai">
+        <div class="portfolio-card-header" style="background:linear-gradient(135deg,#4c1d95,#7c3aed);">
+          <span class="portfolio-niche-badge" style="background:rgba(255,255,255,.2);color:#fff;">🏠 Real Estate</span>
+          <div class="portfolio-card-title" style="color:#fff;">Marcus Chen — Real Estate Group</div>
+          <div class="portfolio-card-sub" style="color:rgba(255,255,255,.75);">AI Lead Qualifier + Follow-Up Automation + Content AI</div>
+        </div>
+        <div class="portfolio-card-body">
+          <h4>What Was Built</h4>
+          <div class="portfolio-deliverables">
+            <div class="portfolio-deliverable">AI lead qualifier chatbot that scores buyer vs. seller intent</div>
+            <div class="portfolio-deliverable">Listing inquiry auto-responder with property info and showing scheduler</div>
+            <div class="portfolio-deliverable">7-day automated follow-up sequence for new leads</div>
+            <div class="portfolio-deliverable">AI content system generating weekly market update emails</div>
+            <div class="portfolio-deliverable">Instagram caption generator from listing photos</div>
+          </div>
+          <h4>Results</h4>
+          <div class="portfolio-results">
+            <div class="portfolio-result"><div class="r-val" style="color:#4c1d95;">5×</div><div class="r-label">Lead response speed</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#4c1d95;">28%</div><div class="r-label">Higher lead-to-showing rate</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#4c1d95;">10 hrs</div><div class="r-label">Saved per week on content</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#4c1d95;">0</div><div class="r-label">Leads falling through cracks</div></div>
+          </div>
+          <h4>Tools Used</h4>
+          <div class="portfolio-tools">
+            <span class="portfolio-tool">Voiceflow</span>
+            <span class="portfolio-tool">OpenAI GPT-4</span>
+            <span class="portfolio-tool">n8n</span>
+            <span class="portfolio-tool">Follow Up Boss CRM</span>
+            <span class="portfolio-tool">Zapier</span>
+            <span class="portfolio-tool">Canva API</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 5: Contractor Website + Automation -->
+      <div class="portfolio-card fade-up" data-tags="website automation">
+        <div class="portfolio-card-header" style="background:linear-gradient(135deg,#78350f,#f59e0b);">
+          <span class="portfolio-niche-badge" style="background:rgba(255,255,255,.2);color:#fff;">🏗️ General Contracting</span>
+          <div class="portfolio-card-title" style="color:#fff;">Apex Build &amp; Remodel</div>
+          <div class="portfolio-card-sub" style="color:rgba(255,255,255,.75);">Portfolio Website + Estimate System + Automation</div>
+        </div>
+        <div class="portfolio-card-body">
+          <h4>What Was Built</h4>
+          <div class="portfolio-deliverables">
+            <div class="portfolio-deliverable">10-page contractor website with project photo gallery by category</div>
+            <div class="portfolio-deliverable">Online estimate request form with project type, budget, and timeline fields</div>
+            <div class="portfolio-deliverable">Estimate request → owner notification → auto PDF quote template via Make.com</div>
+            <div class="portfolio-deliverable">Follow-up sequence if client doesn't respond in 3 days</div>
+            <div class="portfolio-deliverable">Google review request 2 weeks after project completion</div>
+          </div>
+          <h4>Results</h4>
+          <div class="portfolio-results">
+            <div class="portfolio-result"><div class="r-val" style="color:#78350f;">2×</div><div class="r-label">Estimate requests per month</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#78350f;">35%</div><div class="r-label">Higher estimate close rate</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#78350f;">+18</div><div class="r-label">Google reviews in 90 days</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#78350f;">6 days</div><div class="r-label">From start to live site</div></div>
+          </div>
+          <h4>Tools Used</h4>
+          <div class="portfolio-tools">
+            <span class="portfolio-tool">HTML/CSS/JS</span>
+            <span class="portfolio-tool">Make.com</span>
+            <span class="portfolio-tool">Netlify Forms</span>
+            <span class="portfolio-tool">Google Sheets CRM</span>
+            <span class="portfolio-tool">Twilio SMS</span>
+            <span class="portfolio-tool">PDF Monkey</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 6: Salon Chatbot + Generative AI -->
+      <div class="portfolio-card fade-up" data-tags="chatbot genai automation">
+        <div class="portfolio-card-header" style="background:linear-gradient(135deg,#831843,#ec4899);">
+          <span class="portfolio-niche-badge" style="background:rgba(255,255,255,.2);color:#fff;">💇 Salon &amp; Spa</span>
+          <div class="portfolio-card-title" style="color:#fff;">Luxe Beauty Studio</div>
+          <div class="portfolio-card-sub" style="color:rgba(255,255,255,.75);">Booking Chatbot + Social Content AI + Retention Flows</div>
+        </div>
+        <div class="portfolio-card-body">
+          <h4>What Was Built</h4>
+          <div class="portfolio-deliverables">
+            <div class="portfolio-deliverable">AI booking chatbot integrated with their booking system</div>
+            <div class="portfolio-deliverable">Generative AI creates 5 Instagram captions per week automatically</div>
+            <div class="portfolio-deliverable">Appointment reminder 24 hours before via SMS</div>
+            <div class="portfolio-deliverable">Lapsed client reactivation email (triggered if client hasn't booked in 60 days)</div>
+            <div class="portfolio-deliverable">Post-appointment "Rate Us" review request with Google link</div>
+          </div>
+          <h4>Results</h4>
+          <div class="portfolio-results">
+            <div class="portfolio-result"><div class="r-val" style="color:#831843;">55%</div><div class="r-label">Fewer no-show appointments</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#831843;">3×</div><div class="r-label">Instagram engagement growth</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#831843;">+40</div><div class="r-label">Rebookings from lapsed clients</div></div>
+            <div class="portfolio-result"><div class="r-val" style="color:#831843;">5 hrs</div><div class="r-label">Saved on content creation/week</div></div>
+          </div>
+          <h4>Tools Used</h4>
+          <div class="portfolio-tools">
+            <span class="portfolio-tool">Chatbase</span>
+            <span class="portfolio-tool">OpenAI GPT-4</span>
+            <span class="portfolio-tool">Make.com</span>
+            <span class="portfolio-tool">Calendly</span>
+            <span class="portfolio-tool">Mailchimp</span>
+            <span class="portfolio-tool">Twilio SMS</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- NOTE BANNER -->
+<section style="padding:48px 0;">
+  <div class="container">
+    <div style="background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.2);border-radius:var(--radius-lg);padding:32px 40px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+      <div style="font-size:2rem;">💡</div>
+      <div style="flex:1;min-width:240px;">
+        <p style="font-weight:800;font-size:1rem;margin-bottom:6px;">These are representative samples built for this portfolio.</p>
+        <p style="color:var(--text-light);font-size:.88rem;">As SmithDev Labs grows, this page will be updated with real client case studies and live site links. Book a call and we'll build a live demo for <em>your</em> business in real time.</p>
+      </div>
+      <a href="contact.html" class="btn btn-primary" style="flex-shrink:0;">Book a Free Demo Call →</a>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container" style="position:relative;z-index:1;">
+    <h2>Want a Demo Built for Your Business?</h2>
+    <p>Book a free AI audit call and we'll build a live example using your actual business — on screen, in real time. No pressure, no obligation.</p>
+    <div class="cta-actions">
+      <a href="contact.html" class="btn btn-white btn-lg">Book Free AI Audit Call</a>
+      <a href="pricing.html" class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,.5);">View Pricing →</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><img src="images/logo.png" alt="SmithDev Labs LLC" class="nav-logo-img" /></div>
+        <p>AI-powered websites, chatbots, and automation systems for small and medium businesses.</p>
+        <div class="social-links">
+          <a href="#" class="social-link">in</a>
+          <a href="#" class="social-link">fb</a>
+          <a href="#" class="social-link">𝕏</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a href="services.html">Business Websites</a></li><li><a href="services.html">AI Chatbots</a></li><li><a href="services.html">Automation Systems</a></li><li><a href="services.html">AI Agents</a></li><li><a href="services.html">Generative AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About Us</a></li><li><a href="portfolio.html">Portfolio</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="testimonials.html">Reviews</a></li><li><a href="contact.html">Book a Call</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="mailto:msmith@smithdevlabs.com">msmith@smithdevlabs.com</a></li><li><a href="https://smithdevlabs.com">smithdevlabs.com</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmithDev Labs LLC. All rights reserved.</p>
+      <p>Built with AI · Powered by SmithDev Labs</p>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script src="js/chatbot.js"></script>
+<script>
+function filterPortfolio(tag, btn) {
+  document.querySelectorAll('.demo-tab').forEach(t => { t.style.background=''; t.style.color=''; t.style.borderColor=''; t.classList.remove('active'); });
+  btn.style.background = 'var(--primary-light)';
+  btn.style.color = '#fff';
+  btn.style.borderColor = 'var(--primary-light)';
+  document.querySelectorAll('.portfolio-card').forEach(card => {
+    if (tag === 'all' || card.dataset.tags.includes(tag)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+</body>
+</html>

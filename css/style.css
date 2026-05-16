@@ -716,6 +716,17 @@ ul { list-style: none; }
   .review-form-wrap { padding: 24px 16px; }
 }
 
+.empty-reviews {
+  text-align: center;
+  padding: 60px 24px;
+  background: var(--bg-alt);
+  border-radius: var(--radius);
+  border: 2px dashed var(--border);
+}
+.empty-reviews-icon { font-size: 3.5rem; margin-bottom: 16px; }
+.empty-reviews h3 { font-size: 1.4rem; margin-bottom: 12px; color: var(--dark); }
+.empty-reviews p { color: var(--text-light); max-width: 480px; margin: 0 auto 28px; line-height: 1.7; }
+
 /* ── ANIMATIONS ─────────────────────────────────────────── */
 .fade-up { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }

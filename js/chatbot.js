@@ -348,15 +348,12 @@
 
   function showBookingConfirmation(lead) {
     const scheduleURL = getScheduleURL();
-    const gcalURL = buildGCalURL(lead);
-    const mailtoURL = buildMailtoURL(lead);
-    const leadJSON = buildLeadJSON(lead);
 
     saveLeadToStorage(lead);
 
     const card = `
       <div class="sdl-booking-card">
-        <h4>🎉 You're all set, ${lead.name.split(' ')[0]}!</h4>
+        <h4>🎉 Almost there, ${lead.name.split(' ')[0]}!</h4>
         <div class="sdl-lead-row" style="margin-bottom:10px;font-size:0.8rem;color:#475569;line-height:1.6;">
           <strong>Name:</strong> ${lead.name}<br>
           <strong>Email:</strong> ${lead.email}<br>
@@ -365,17 +362,6 @@
         </div>
         <div class="sdl-booking-actions">
           <a class="sdl-btn-calendar" href="${scheduleURL}" target="_blank" style="font-size:0.85rem;padding:10px 12px;">📅 Pick Your Call Time</a>
-          <a class="sdl-btn-calendar" href="${gcalURL}" target="_blank" style="font-size:0.8rem;background:#0f9d58;">📆 Add to Google Calendar</a>
-          <a class="sdl-btn-email" href="${mailtoURL}" target="_blank" style="font-size:0.8rem;">📧 Send Info to Michael (Gmail)</a>
-          <button type="button" class="sdl-btn-copy" onclick="(function(btn){
-            navigator.clipboard.writeText(${JSON.stringify(leadJSON)}).then(function(){
-              btn.textContent = '✅ Copied!';
-              var s = btn.nextElementSibling;
-              if(s) { s.style.display = 'block'; }
-              setTimeout(function(){ btn.textContent = '📋 Copy Info (for CRM import)'; }, 2000);
-            });
-          })(this)">📋 Copy Info (for CRM import)</button>
-          <div class="sdl-copy-success">Paste into SmithDevLabs CRM → Import Lead</div>
         </div>
         <div style="font-size:0.72rem;color:#94a3b8;text-align:center;margin-top:8px;">
           📞 Michael will confirm within 2 hours during business hours (Mon–Fri 9AM–5PM EST)

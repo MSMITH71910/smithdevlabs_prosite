@@ -288,10 +288,10 @@
 
       <div id="bs-success" class="booking-success" style="display:none;">
         <div class="success-icon">🎉</div>
-        <h3>You're Booked!</h3>
-        <p>Your appointment request has been sent to Michael. He'll confirm via email within 2 hours during business hours (Mon–Fri 9AM–5PM EST).</p>
+        <h3>All Done — You're Booked!</h3>
+        <p>Everything has been taken care of automatically. Check the windows that just opened, and Michael will confirm your appointment within 2 hours.</p>
         <div class="success-actions" id="successActions"></div>
-        <p class="crm-copy-note" style="margin-top:14px;">Your info has been saved. Michael will reach out to confirm the exact meeting link.</p>
+        <p class="crm-copy-note" style="margin-top:14px;">Your lead info was also saved to the CRM and copied to your clipboard.</p>
       </div>
 
       <div id="bs-1" class="booking-section active">
@@ -572,8 +572,9 @@
 
     const gcalURL  = buildGCalURL(lead);
     const leadJSON = JSON.stringify(lead, null, 2);
-    const subject  = encodeURIComponent(`📅 New Booking Request — ${lead.name} (${selectedDay} ${selectedTime} EST)`);
-    const body     = encodeURIComponent(
+
+    const ownerSubject = encodeURIComponent(`📅 New Booking Request — ${lead.name} (${selectedDay} ${selectedTime} EST)`);
+    const ownerBody    = encodeURIComponent(
       `New booking request from the SmithDev Labs website:\n\n` +
       `Name:     ${lead.name}\n` +
       `Email:    ${lead.email}\n` +
@@ -583,9 +584,35 @@
       `Day:      ${selectedDay}\n` +
       `Time:     ${selectedTime} EST\n` +
       `Notes:    ${notes || 'None'}\n\n` +
-      `Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} EST`
+      `Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} EST\n\n` +
+      `Please confirm this appointment within 2 hours.`
     );
-    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=msmith%40smithdevlabs.com&su=${subject}&body=${body}`;
+    const ownerGmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=msmith%40smithdevlabs.com&su=${ownerSubject}&body=${ownerBody}`;
+
+    const clientSubject = encodeURIComponent(`✅ Your Call with SmithDev Labs is Requested — ${selectedDay} at ${selectedTime} EST`);
+    const clientBody    = encodeURIComponent(
+      `Hi ${first},\n\nThanks for booking a call with SmithDev Labs!\n\n` +
+      `Here are your appointment details:\n\n` +
+      `📅 Day:     ${selectedDay}\n` +
+      `🕘 Time:    ${selectedTime} EST\n` +
+      `🔧 Service: ${service || 'Free AI Audit Call'}\n\n` +
+      `Michael will confirm your appointment via email within 2 hours during business hours (Mon–Fri 9AM–5PM EST).\n\n` +
+      `Questions? Reply to this email or reach us at msmith@smithdevlabs.com.\n\n` +
+      `— Michael R. Smith\nSmithDev Labs LLC`
+    );
+    const clientGmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${clientSubject}&body=${clientBody}`;
+
+    try { navigator.clipboard.writeText(leadJSON); } catch(e) {}
+
+    window.open(gcalURL, '_blank');
+
+    function openViaLink(url) {
+      const a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+    setTimeout(() => openViaLink(ownerGmailURL), 300);
+    setTimeout(() => openViaLink(clientGmailURL), 700);
 
     document.querySelector('.booking-steps-nav').style.display = 'none';
     for (let i = 1; i <= 4; i++) document.getElementById('bs-' + i).classList.remove('active');
@@ -593,12 +620,16 @@
     suc.style.display = 'block';
 
     document.getElementById('successActions').innerHTML = `
-      <a class="sa-gcal" href="${gcalURL}" target="_blank">📅 Add to Your Google Calendar</a>
-      <a class="sa-email" href="${gmailURL}" target="_blank">📧 Send Booking Email via Gmail</a>
-      <button type="button" class="sa-crm" onclick="copyLeadJSON(this, ${JSON.stringify(leadJSON).replace(/"/g, '&quot;')})">📋 Copy to CRM (Import Lead)</button>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;text-align:left;font-size:0.82rem;color:#166534;line-height:1.8;">
+        <div>✅ <strong>Google Calendar</strong> event opened for you to save</div>
+        <div>✅ <strong>CRM</strong> — lead data auto-saved &amp; copied to clipboard</div>
+        <div>✅ <strong>Your confirmation email</strong> is ready to send to ${lead.email}</div>
+        <div>✅ <strong>Michael has been notified</strong> — he'll confirm within 2 hours</div>
+      </div>
+      <div style="font-size:0.78rem;color:#94a3b8;text-align:center;margin-top:4px;">If any email windows were blocked, use the links below:</div>
+      <a class="sa-email" href="${ownerGmailURL}" target="_blank" style="font-size:0.8rem;">📧 Re-send Notification to Michael</a>
+      <a class="sa-gcal" href="${clientGmailURL}" target="_blank" style="font-size:0.8rem;background:#7c3aed;">📨 Re-send Confirmation to Client</a>
     `;
-
-    window.open(gcalURL, '_blank');
   }
 
   function copyLeadJSON(btn, json) {

@@ -315,7 +315,7 @@
       `Captured:  ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} EST\n\n` +
       `---\nTo add this client to your CRM, open SmithDevLabs_CRM.html and click "Import Lead".`
     );
-    return `mailto:msmith@smithdevlabs.com?subject=${subject}&body=${body}`;
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=msmith%40smithdevlabs.com&su=${subject}&body=${body}`;
   }
 
   function buildLeadJSON(lead) {
@@ -356,11 +356,17 @@
 
     const card = `
       <div class="sdl-booking-card">
-        <h4>🎉 Perfect, ${lead.name.split(' ')[0]}! One last step →</h4>
-        <div class="sdl-lead-row" style="margin-bottom:10px;font-size:0.8rem;color:#475569;">Your info is saved. Now <strong style="color:#1e40af;">pick a time that works for you</strong> using the button below:</div>
+        <h4>🎉 You're all set, ${lead.name.split(' ')[0]}!</h4>
+        <div class="sdl-lead-row" style="margin-bottom:10px;font-size:0.8rem;color:#475569;line-height:1.6;">
+          <strong>Name:</strong> ${lead.name}<br>
+          <strong>Email:</strong> ${lead.email}<br>
+          <strong>Phone:</strong> ${lead.phone}<br>
+          <strong>Service:</strong> ${lead.service}
+        </div>
         <div class="sdl-booking-actions">
-          <a class="sdl-btn-calendar" href="${scheduleURL}" target="_blank" style="font-size:0.85rem;padding:10px 12px;">📅 Pick Your Time — Open Scheduler</a>
-          <a class="sdl-btn-email" href="${mailtoURL}" style="font-size:0.8rem;">📧 Email Michael Instead</a>
+          <a class="sdl-btn-calendar" href="${scheduleURL}" target="_blank" style="font-size:0.85rem;padding:10px 12px;">📅 Pick Your Call Time</a>
+          <a class="sdl-btn-calendar" href="${gcalURL}" target="_blank" style="font-size:0.8rem;background:#0f9d58;">📆 Add to Google Calendar</a>
+          <a class="sdl-btn-email" href="${mailtoURL}" target="_blank" style="font-size:0.8rem;">📧 Send Info to Michael (Gmail)</a>
           <button type="button" class="sdl-btn-copy" onclick="(function(btn){
             navigator.clipboard.writeText(${JSON.stringify(leadJSON)}).then(function(){
               btn.textContent = '✅ Copied!';

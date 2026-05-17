@@ -583,25 +583,22 @@
       `Day:      ${selectedDay}\n` +
       `Time:     ${selectedTime} EST\n` +
       `Notes:    ${notes || 'None'}\n\n` +
-      `Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} EST\n\n` +
-      `---\nAdd to Google Calendar: ${gcalURL}`
+      `Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} EST`
     );
-    const mailtoURL = `mailto:msmith@smithdevlabs.com?subject=${subject}&body=${body}`;
+    const gmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=msmith%40smithdevlabs.com&su=${subject}&body=${body}`;
 
-    window.location.href = mailtoURL;
+    document.querySelector('.booking-steps-nav').style.display = 'none';
+    for (let i = 1; i <= 4; i++) document.getElementById('bs-' + i).classList.remove('active');
+    const suc = document.getElementById('bs-success');
+    suc.style.display = 'block';
 
-    setTimeout(() => {
-      document.getElementById('booking-steps-nav') && (document.querySelector('.booking-steps-nav').style.display = 'none');
-      for (let i = 1; i <= 4; i++) document.getElementById('bs-' + i).classList.remove('active');
-      const suc = document.getElementById('bs-success');
-      suc.style.display = 'block';
+    document.getElementById('successActions').innerHTML = `
+      <a class="sa-gcal" href="${gcalURL}" target="_blank">📅 Add to Your Google Calendar</a>
+      <a class="sa-email" href="${gmailURL}" target="_blank">📧 Send Booking Email via Gmail</a>
+      <button type="button" class="sa-crm" onclick="copyLeadJSON(this, ${JSON.stringify(leadJSON).replace(/"/g, '&quot;')})">📋 Copy to CRM (Import Lead)</button>
+    `;
 
-      document.getElementById('successActions').innerHTML = `
-        <a class="sa-gcal" href="${gcalURL}" target="_blank">📅 Add to Your Google Calendar</a>
-        <a class="sa-email" href="${mailtoURL}">📧 Send Booking Email to Michael</a>
-        <button type="button" class="sa-crm" onclick="copyLeadJSON(this, ${JSON.stringify(leadJSON).replace(/"/g, '&quot;')})">📋 Copy to CRM (Import Lead)</button>
-      `;
-    }, 800);
+    window.open(gcalURL, '_blank');
   }
 
   function copyLeadJSON(btn, json) {

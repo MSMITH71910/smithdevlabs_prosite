@@ -57,7 +57,7 @@ if (form) {
       `Submitted:  ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} EST`
     );
 
-    window.location.href = `mailto:msmith@smithdevlabs.com?subject=${subject}&body=${body}`;
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=msmith%40smithdevlabs.com&su=${subject}&body=${body}`, '_blank');
 
     btn.textContent = '✅ Opening your email…';
     btn.disabled = true;

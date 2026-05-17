@@ -697,27 +697,32 @@
         if (!b.name || !b.email) return;
         const alreadyClient = clients.some(c => c.email === b.email);
         if (alreadyClient) return;
+        const callNote = (b.day && b.time) ? `Requested call: ${b.day} at ${b.time} EST. ` : '';
         clients.unshift({
-          id: b.id || Date.now().toString() + Math.random(),
+          id: b.id || (Date.now().toString() + Math.random()),
           name: b.name,
           business: b.business || '',
           email: b.email,
           phone: b.phone || '',
           service: b.service || '',
-          status: 'Lead',
+          status: 'prospect',
           value: '',
           date: b.date || new Date().toISOString().split('T')[0],
-          notes: `Booked call: ${b.day || ''} ${b.time || ''} EST. ${b.notes || ''}`.trim()
+          notes: (callNote + (b.notes || '')).trim()
         });
         added++;
       });
       if (added > 0) {
         save();
+        renderClients();
+        updateStats();
+        updateBookingsBadge();
         const banner = document.createElement('div');
-        banner.style.cssText = 'position:fixed;top:16px;right:16px;background:#22c55e;color:white;padding:12px 20px;border-radius:10px;font-size:0.85rem;font-weight:700;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
-        banner.textContent = `✅ ${added} new lead${added > 1 ? 's' : ''} auto-imported from booking form`;
+        banner.style.cssText = 'position:fixed;top:16px;right:16px;background:#22c55e;color:white;padding:14px 22px;border-radius:12px;font-size:0.88rem;font-weight:700;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.25);cursor:pointer;';
+        banner.innerHTML = `✅ ${added} new lead${added > 1 ? 's' : ''} auto-imported from booking form<br><span style="font-weight:400;font-size:0.78rem;opacity:0.85;">Click to dismiss</span>`;
+        banner.onclick = () => banner.remove();
         document.body.appendChild(banner);
-        setTimeout(() => banner.remove(), 4000);
+        setTimeout(() => { if (banner.parentNode) banner.remove(); }, 6000);
       }
     } catch(e) {}
   }

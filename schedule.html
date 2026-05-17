@@ -570,8 +570,7 @@
       localStorage.setItem('sdl-bookings', JSON.stringify(bookings));
     } catch(e) {}
 
-    const gcalURL  = buildGCalURL(lead);
-    const leadJSON = JSON.stringify(lead, null, 2);
+    const gcalURL = buildGCalURL(lead);
 
     const ownerSubject = encodeURIComponent(`📅 New Booking Request — ${lead.name} (${selectedDay} ${selectedTime} EST)`);
     const ownerBody    = encodeURIComponent(
@@ -602,18 +601,9 @@
     );
     const clientGmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${clientSubject}&body=${clientBody}`;
 
-    try { navigator.clipboard.writeText(leadJSON); } catch(e) {}
+    const crmURL = window.location.href.replace(/\/[^/]*$/, '/crm.html');
 
     window.open(gcalURL, '_blank');
-
-    function openViaLink(url) {
-      const a = document.createElement('a');
-      a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    }
-    setTimeout(() => openViaLink(ownerGmailURL), 300);
-    setTimeout(() => openViaLink(clientGmailURL), 700);
-    setTimeout(() => openViaLink(window.location.href.replace(/\/[^/]*$/, '/crm.html')), 1100);
 
     document.querySelector('.booking-steps-nav').style.display = 'none';
     for (let i = 1; i <= 4; i++) document.getElementById('bs-' + i).classList.remove('active');
@@ -621,15 +611,14 @@
     suc.style.display = 'block';
 
     document.getElementById('successActions').innerHTML = `
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;text-align:left;font-size:0.82rem;color:#166534;line-height:1.8;">
-        <div>✅ <strong>Google Calendar</strong> event opened for you to save</div>
-        <div>✅ <strong>CRM</strong> — lead auto-imported (opening now in new tab)</div>
-        <div>✅ <strong>Your confirmation email</strong> is ready to send to ${lead.email}</div>
-        <div>✅ <strong>Michael has been notified</strong> — he'll confirm within 2 hours</div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 18px;text-align:left;font-size:0.83rem;color:#166534;line-height:2;margin-bottom:4px;">
+        <div>✅ <strong>Google Calendar</strong> — event editor opened, save it to your calendar</div>
+        <div>✅ <strong>CRM</strong> — lead saved &amp; will auto-appear when you open the CRM</div>
       </div>
-      <div style="font-size:0.78rem;color:#94a3b8;text-align:center;margin-top:4px;">If any email windows were blocked, use the links below:</div>
-      <a class="sa-email" href="${ownerGmailURL}" target="_blank" style="font-size:0.8rem;">📧 Re-send Notification to Michael</a>
-      <a class="sa-gcal" href="${clientGmailURL}" target="_blank" style="font-size:0.8rem;background:#7c3aed;">📨 Re-send Confirmation to Client</a>
+      <p style="font-size:0.8rem;color:#475569;font-weight:600;margin:10px 0 6px;text-align:left;">Now send these 2 quick emails:</p>
+      <a href="${ownerGmailURL}" target="_blank" style="display:block;text-align:center;background:#1e40af;color:white;padding:11px 16px;border-radius:9px;font-size:0.88rem;font-weight:700;text-decoration:none;margin-bottom:8px;">📧 Send Notification to Michael</a>
+      <a href="${clientGmailURL}" target="_blank" style="display:block;text-align:center;background:#7c3aed;color:white;padding:11px 16px;border-radius:9px;font-size:0.88rem;font-weight:700;text-decoration:none;margin-bottom:8px;">📨 Send Confirmation to ${first}</a>
+      <a href="${crmURL}" target="_blank" style="display:block;text-align:center;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;padding:9px 16px;border-radius:9px;font-size:0.82rem;font-weight:600;text-decoration:none;">🗂️ Open CRM — ${lead.name} will be there</a>
     `;
   }
 

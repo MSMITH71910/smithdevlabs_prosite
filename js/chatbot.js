@@ -151,13 +151,12 @@
   let bookingState = null;
   let leadData = {};
 
-  const BOOKING_STEPS = ['name', 'email', 'phone', 'service', 'time'];
+  const BOOKING_STEPS = ['name', 'email', 'phone', 'service'];
   const BOOKING_PROMPTS = {
     name:    `What's your **full name**?`,
     email:   `Great! What's the best **email address** to reach you?`,
     phone:   `And your **phone number**? (We may text you a confirmation)`,
-    service: `What **service** are you most interested in?\n\n• Website\n• AI Chatbot\n• Business Automation\n• Full AI System\n• Not sure yet — just exploring`,
-    time:    `**Almost done!** What's your **preferred day and time** for the call?\n\nExample: *"Tuesday at 2pm"* or *"Any morning this week"*\n\n_(Office hours: Mon–Fri 9AM–5PM EST)_`
+    service: `Almost there! What **service** are you most interested in?\n\n• Website\n• AI Chatbot\n• Business Automation\n• Full AI System\n• Not sure yet — just exploring`
   };
 
   function matchReply(input) {
@@ -299,7 +298,7 @@
   function buildGCalURL(lead) {
     const title = encodeURIComponent(`Discovery Call — SmithDev Labs × ${lead.name}`);
     const details = encodeURIComponent(
-      `New lead from SmithDev Labs chatbot\n\nName: ${lead.name}\nEmail: ${lead.email}\nPhone: ${lead.phone}\nService: ${lead.service}\nPreferred time: ${lead.time}\n\nNotes: Booked via website chatbot.`
+      `New lead from SmithDev Labs chatbot\n\nName: ${lead.name}\nEmail: ${lead.email}\nPhone: ${lead.phone}\nService: ${lead.service}\n\nNotes: Booked via website chatbot.`
     );
     const guests = encodeURIComponent(lead.email);
     return `https://calendar.google.com/calendar/r/eventedit?text=${title}&details=${details}&add=${guests}&src=msmith%40smithdevlabs.com`;
@@ -312,8 +311,7 @@
       `Name:      ${lead.name}\n` +
       `Email:     ${lead.email}\n` +
       `Phone:     ${lead.phone}\n` +
-      `Service:   ${lead.service}\n` +
-      `Preferred: ${lead.time}\n\n` +
+      `Service:   ${lead.service}\n\n` +
       `Captured:  ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} EST\n\n` +
       `---\nTo add this client to your CRM, open SmithDevLabs_CRM.html and click "Import Lead".`
     );
@@ -331,8 +329,13 @@
       status: 'Lead',
       value: '',
       date: new Date().toISOString().split('T')[0],
-      notes: `Preferred time: ${lead.time}. Booked via website chatbot on ${new Date().toLocaleDateString()}.`
+      notes: `Booked via website chatbot on ${new Date().toLocaleDateString()}.`
     }, null, 2);
+  }
+
+  function getScheduleURL() {
+    const base = window.location.href.replace(/\/[^/]*$/, '/');
+    return base + 'schedule.html';
   }
 
   function saveLeadToStorage(lead) {
@@ -344,6 +347,7 @@
   }
 
   function showBookingConfirmation(lead) {
+    const scheduleURL = getScheduleURL();
     const gcalURL = buildGCalURL(lead);
     const mailtoURL = buildMailtoURL(lead);
     const leadJSON = buildLeadJSON(lead);
@@ -352,24 +356,23 @@
 
     const card = `
       <div class="sdl-booking-card">
-        <h4>🎉 You're all set, ${lead.name.split(' ')[0]}!</h4>
-        <div class="sdl-lead-row"><strong>Name:</strong> ${lead.name}</div>
-        <div class="sdl-lead-row"><strong>Email:</strong> ${lead.email}</div>
-        <div class="sdl-lead-row"><strong>Phone:</strong> ${lead.phone}</div>
-        <div class="sdl-lead-row"><strong>Service:</strong> ${lead.service}</div>
-        <div class="sdl-lead-row"><strong>Preferred time:</strong> ${lead.time}</div>
+        <h4>🎉 Perfect, ${lead.name.split(' ')[0]}! One last step →</h4>
+        <div class="sdl-lead-row" style="margin-bottom:10px;font-size:0.8rem;color:#475569;">Your info is saved. Now <strong style="color:#1e40af;">pick a time that works for you</strong> using the button below:</div>
         <div class="sdl-booking-actions">
-          <a class="sdl-btn-calendar" href="${gcalURL}" target="_blank">📅 Add to Google Calendar</a>
-          <a class="sdl-btn-email" href="${mailtoURL}">📧 Email Info to Michael</a>
+          <a class="sdl-btn-calendar" href="${scheduleURL}" target="_blank" style="font-size:0.85rem;padding:10px 12px;">📅 Pick Your Time — Open Scheduler</a>
+          <a class="sdl-btn-email" href="${mailtoURL}" style="font-size:0.8rem;">📧 Email Michael Instead</a>
           <button type="button" class="sdl-btn-copy" onclick="(function(btn){
             navigator.clipboard.writeText(${JSON.stringify(leadJSON)}).then(function(){
               btn.textContent = '✅ Copied!';
               var s = btn.nextElementSibling;
               if(s) { s.style.display = 'block'; }
-              setTimeout(function(){ btn.textContent = '📋 Copy Lead JSON (for CRM import)'; }, 2000);
+              setTimeout(function(){ btn.textContent = '📋 Copy Info (for CRM import)'; }, 2000);
             });
-          })(this)">📋 Copy Lead JSON (for CRM import)</button>
+          })(this)">📋 Copy Info (for CRM import)</button>
           <div class="sdl-copy-success">Paste into SmithDevLabs CRM → Import Lead</div>
+        </div>
+        <div style="font-size:0.72rem;color:#94a3b8;text-align:center;margin-top:8px;">
+          📞 Michael will confirm within 2 hours during business hours (Mon–Fri 9AM–5PM EST)
         </div>
       </div>
     `;

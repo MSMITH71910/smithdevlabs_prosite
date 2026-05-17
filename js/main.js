@@ -58,7 +58,7 @@ if (form) {
     } catch {
       btn.textContent = 'Send Message';
       btn.disabled = false;
-      alert('Something went wrong. Please email us directly at hello@smithdevlabs.com');
+      alert('Something went wrong. Please email us directly at msmith@smithdevlabs.com');
     }
   });
 }

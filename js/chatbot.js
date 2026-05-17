@@ -198,13 +198,13 @@
               <div id="sdl-header-status"><span id="sdl-status-dot"></span>${isBusinessHours() ? ' Open now · Replies instantly' : ' After hours · Books 24/7'}</div>
             </div>
           </div>
-          <button id="sdl-close-btn" aria-label="Close chat">✕</button>
+          <button type="button" id="sdl-close-btn" aria-label="Close chat">✕</button>
         </div>
         <div id="sdl-chat-messages"></div>
         <div id="sdl-quick-replies"></div>
         <div id="sdl-chat-input-row">
           <input id="sdl-chat-input" type="text" placeholder="Ask me anything…" autocomplete="off" />
-          <button id="sdl-send-btn" aria-label="Send">➤</button>
+          <button type="button" id="sdl-send-btn" aria-label="Send">➤</button>
         </div>
         <div id="sdl-chat-footer">Mon–Fri 9AM–5PM EST · <a href="mailto:msmith@smithdevlabs.com">msmith@smithdevlabs.com</a></div>
       </div>
@@ -288,6 +288,7 @@
     container.innerHTML = '';
     replies.forEach(r => {
       const btn = document.createElement('button');
+      btn.type = 'button';
       btn.className = 'sdl-quick-btn';
       btn.textContent = r;
       btn.addEventListener('click', () => handleInput(r));
@@ -360,7 +361,7 @@
         <div class="sdl-booking-actions">
           <a class="sdl-btn-calendar" href="${gcalURL}" target="_blank">📅 Add to Google Calendar</a>
           <a class="sdl-btn-email" href="${mailtoURL}">📧 Email Info to Michael</a>
-          <button class="sdl-btn-copy" onclick="(function(btn){
+          <button type="button" class="sdl-btn-copy" onclick="(function(btn){
             navigator.clipboard.writeText(${JSON.stringify(leadJSON)}).then(function(){
               btn.textContent = '✅ Copied!';
               var s = btn.nextElementSibling;

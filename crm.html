@@ -773,121 +773,142 @@
   updateBookingsBadge();
   autoImportPendingBookings();
 
-  // --- GOOGLE DRIVE BACKUP (File System Access API) ---
-  let driveFileHandle = null;
+  // --- GOOGLE DRIVE BACKUP (Drive REST API + Google Identity Services) ---
+  const DRIVE_FILE_NAME = 'SmithDevLabs_CRM_Backup.json';
+  const DRIVE_SCOPE     = 'https://www.googleapis.com/auth/drive.file';
 
-  async function openDriveIDB() {
-    return new Promise((res, rej) => {
-      const req = indexedDB.open('sdl-drive-backup', 1);
-      req.onupgradeneeded = e => e.target.result.createObjectStore('handles');
-      req.onsuccess = e => res(e.target.result);
-      req.onerror   = () => rej();
+  let _driveToken    = null;
+  let _driveFileId   = localStorage.getItem('sdl-drive-file-id')   || null;
+  let _driveClientId = localStorage.getItem('sdl-drive-client-id') || null;
+  let _tokenClient   = null;
+
+  function loadGIS() {
+    return new Promise(res => {
+      if (window.google && window.google.accounts) { res(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = () => res();
+      s.onerror = () => res();
+      document.head.appendChild(s);
     });
   }
 
-  async function loadDriveHandle() {
-    try {
-      const db = await openDriveIDB();
-      return new Promise(res => {
-        const req = db.transaction('handles','readonly').objectStore('handles').get('backup');
-        req.onsuccess = e => res(e.target.result || null);
-        req.onerror   = () => res(null);
-      });
-    } catch { return null; }
-  }
-
-  async function storeDriveHandle(handle) {
-    try {
-      const db = await openDriveIDB();
-      return new Promise(res => {
-        const tx = db.transaction('handles','readwrite');
-        tx.objectStore('handles').put(handle, 'backup');
-        tx.oncomplete = () => res();
-        tx.onerror    = () => res();
-      });
-    } catch {}
+  function buildTokenClient(clientId) {
+    _tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: DRIVE_SCOPE,
+      callback: async resp => {
+        if (resp.error || !resp.access_token) { setDriveStatus('error'); return; }
+        _driveToken = resp.access_token;
+        await driveBackup();
+      }
+    });
   }
 
   function setDriveStatus(state) {
     const el = document.getElementById('drive-status');
     if (!el) return;
     if (state === 'ok') {
-      const t = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-      el.innerHTML = `<span style="font-size:.78rem;color:#16a34a;font-weight:700;">✅ Drive backup ${t}</span>&nbsp;<button onclick="disconnectDriveBackup()" style="font-size:.7rem;color:#94a3b8;background:none;border:none;cursor:pointer;" title="Disconnect backup">✕</button>`;
+      const t = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      el.innerHTML = `<span style="font-size:.78rem;color:#16a34a;font-weight:700;">✅ Drive backup ${t}</span>&nbsp;<button onclick="disconnectDriveBackup()" style="font-size:.7rem;color:#94a3b8;background:none;border:none;cursor:pointer;" title="Disconnect">✕</button>`;
     } else if (state === 'resume') {
-      el.innerHTML = `<button onclick="resumeDriveBackup()" style="background:#f59e0b;color:white;border:none;border-radius:7px;padding:5px 12px;font-size:.78rem;font-weight:700;cursor:pointer;" title="Re-authorize Drive backup for this session">▶ Resume Drive Backup</button>`;
-    } else if (state === 'connected') {
-      el.innerHTML = `<span style="font-size:.78rem;color:#3b82f6;font-weight:700;">🔗 Drive connected</span>`;
+      el.innerHTML = `<button onclick="resumeDriveBackup()" style="background:#f59e0b;color:white;border:none;border-radius:7px;padding:5px 12px;font-size:.78rem;font-weight:700;cursor:pointer;">▶ Re-auth Drive</button>`;
     } else if (state === 'error') {
-      el.innerHTML = `<span style="font-size:.78rem;color:#ef4444;">⚠️ Backup failed &nbsp;</span><button onclick="connectDriveBackup()" style="font-size:.72rem;color:#3b82f6;background:none;border:none;cursor:pointer;">Reconnect</button>`;
-    } else {
-      el.innerHTML = `<button onclick="connectDriveBackup()" style="background:#3b82f6;color:white;border:none;border-radius:7px;padding:5px 12px;font-size:.78rem;font-weight:700;cursor:pointer;" title="Pick a file inside your Google Drive folder — auto-saves on every change">📂 Connect Drive Backup</button>`;
+      el.innerHTML = `<span style="font-size:.78rem;color:#ef4444;">⚠️ Backup failed&nbsp;</span><button onclick="connectDriveBackup()" style="font-size:.72rem;color:#3b82f6;background:none;border:none;cursor:pointer;">Retry</button>`;
+    } else if (state === 'none') {
+      el.innerHTML = `<button onclick="connectDriveBackup()" style="background:#3b82f6;color:white;border:none;border-radius:7px;padding:5px 12px;font-size:.78rem;font-weight:700;cursor:pointer;" title="Auto-backup CRM to Google Drive on every change">📂 Connect Drive Backup</button>`;
     }
   }
 
   async function driveBackup() {
-    if (!driveFileHandle) return;
+    if (!_driveToken) return;
+    const payload = JSON.stringify({ exported: new Date().toISOString(), count: clients.length, clients }, null, 2);
     try {
-      const perm = await driveFileHandle.queryPermission({ mode: 'readwrite' });
-      if (perm !== 'granted') { setDriveStatus('resume'); return; }
-      const payload = { exported: new Date().toISOString(), count: clients.length, clients };
-      const writable = await driveFileHandle.createWritable();
-      await writable.write(JSON.stringify(payload, null, 2));
-      await writable.close();
+      if (_driveFileId) {
+        const r = await fetch(
+          `https://www.googleapis.com/upload/drive/v3/files/${_driveFileId}?uploadType=media`,
+          { method: 'PATCH', headers: { 'Authorization': `Bearer ${_driveToken}`, 'Content-Type': 'application/json' }, body: payload }
+        );
+        if (r.status === 401) { _driveToken = null; setDriveStatus('resume'); return; }
+        if (r.status === 404) { _driveFileId = null; localStorage.removeItem('sdl-drive-file-id'); }
+        else if (r.ok) { setDriveStatus('ok'); return; }
+      }
+
+      const search = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=name%3D'${encodeURIComponent(DRIVE_FILE_NAME)}'+and+trashed%3Dfalse&fields=files(id)`,
+        { headers: { 'Authorization': `Bearer ${_driveToken}` } }
+      );
+      if (search.status === 401) { _driveToken = null; setDriveStatus('resume'); return; }
+      const { files } = await search.json();
+
+      if (files && files.length > 0) {
+        _driveFileId = files[0].id;
+        localStorage.setItem('sdl-drive-file-id', _driveFileId);
+        await fetch(
+          `https://www.googleapis.com/upload/drive/v3/files/${_driveFileId}?uploadType=media`,
+          { method: 'PATCH', headers: { 'Authorization': `Bearer ${_driveToken}`, 'Content-Type': 'application/json' }, body: payload }
+        );
+      } else {
+        const meta = JSON.stringify({ name: DRIVE_FILE_NAME, mimeType: 'application/json' });
+        const form = new FormData();
+        form.append('metadata', new Blob([meta], { type: 'application/json' }));
+        form.append('file',     new Blob([payload], { type: 'application/json' }));
+        const cr = await fetch(
+          'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+          { method: 'POST', headers: { 'Authorization': `Bearer ${_driveToken}` }, body: form }
+        );
+        const created = await cr.json();
+        if (created.id) { _driveFileId = created.id; localStorage.setItem('sdl-drive-file-id', _driveFileId); }
+      }
       setDriveStatus('ok');
     } catch { setDriveStatus('error'); }
   }
 
   async function connectDriveBackup() {
-    if (!('showSaveFilePicker' in window)) {
-      alert('Drive backup requires Chrome or Edge. Your current browser does not support this feature.');
-      return;
+    if (!_driveClientId) {
+      const id = prompt(
+        'Paste your Google OAuth 2.0 Client ID below.\n\n' +
+        'Setup (5 min, free):\n' +
+        '1. Go to console.cloud.google.com\n' +
+        '2. Create a project → Enable "Google Drive API"\n' +
+        '3. APIs & Services → Credentials → Create OAuth Client ID\n' +
+        '   Type: Web Application\n' +
+        '   Authorized JS Origin: https://msmith71910.github.io\n' +
+        '4. Copy the Client ID and paste it here'
+      );
+      if (!id) return;
+      if (!id.trim().includes('.apps.googleusercontent.com')) {
+        alert('That doesn\'t look right — Client IDs end in .apps.googleusercontent.com');
+        return;
+      }
+      _driveClientId = id.trim();
+      localStorage.setItem('sdl-drive-client-id', _driveClientId);
     }
-    try {
-      const handle = await window.showSaveFilePicker({
-        suggestedName: 'SmithDevLabs_CRM_Backup.json',
-        types: [{ description: 'JSON Backup', accept: { 'application/json': ['.json'] } }]
-      });
-      driveFileHandle = handle;
-      await storeDriveHandle(handle);
-      setDriveStatus('connected');
-      driveBackup();
-    } catch(e) {
-      if (e.name !== 'AbortError') alert('Could not connect to Drive file: ' + e.message);
-    }
+    await loadGIS();
+    if (!window.google || !window.google.accounts) { alert('Could not load Google auth library. Check your internet connection.'); return; }
+    buildTokenClient(_driveClientId);
+    _tokenClient.requestAccessToken({ prompt: 'consent' });
   }
 
   async function resumeDriveBackup() {
-    if (!driveFileHandle) return;
-    try {
-      const perm = await driveFileHandle.requestPermission({ mode: 'readwrite' });
-      if (perm === 'granted') driveBackup();
-    } catch {}
+    if (!_tokenClient) { await connectDriveBackup(); return; }
+    _tokenClient.requestAccessToken({ prompt: '' });
   }
 
-  async function disconnectDriveBackup() {
-    driveFileHandle = null;
-    try {
-      const db = await openDriveIDB();
-      const tx = db.transaction('handles','readwrite');
-      tx.objectStore('handles').delete('backup');
-    } catch {}
+  function disconnectDriveBackup() {
+    if (_driveToken) { try { google.accounts.oauth2.revoke(_driveToken); } catch {} }
+    _driveToken = null; _driveFileId = null; _driveClientId = null;
+    localStorage.removeItem('sdl-drive-file-id');
+    localStorage.removeItem('sdl-drive-client-id');
     setDriveStatus('none');
   }
 
   async function initDriveBackup() {
-    if (!('showSaveFilePicker' in window)) {
-      setDriveStatus('none');
-      return;
-    }
-    const handle = await loadDriveHandle();
-    if (!handle) { setDriveStatus('none'); return; }
-    driveFileHandle = handle;
-    try {
-      const perm = await handle.queryPermission({ mode: 'readwrite' });
-      if (perm === 'granted') { setDriveStatus('connected'); driveBackup(); }
-      else { setDriveStatus('resume'); }
-    } catch { setDriveStatus('none'); }
+    if (!_driveClientId) { setDriveStatus('none'); return; }
+    await loadGIS();
+    if (!window.google || !window.google.accounts) { setDriveStatus('none'); return; }
+    buildTokenClient(_driveClientId);
+    setDriveStatus('resume');
   }
 
   initDriveBackup();

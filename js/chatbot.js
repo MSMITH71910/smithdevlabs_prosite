@@ -388,20 +388,22 @@
     else if (step === 'email') leadData.email = text;
     else if (step === 'phone') leadData.phone = text;
     else if (step === 'service') leadData.service = text;
-    else if (step === 'time') {
-      leadData.time = text;
-      bookingState = null;
-      showTyping();
-      setTimeout(() => {
-        removeTyping();
-        showBookingConfirmation(leadData);
-      }, TYPING_DELAY);
-      leadData = {};
-      return;
-    }
 
     bookingState++;
     const nextStep = BOOKING_STEPS[bookingState];
+
+    if (!nextStep) {
+      bookingState = null;
+      const captured = Object.assign({}, leadData);
+      leadData = {};
+      showTyping();
+      setTimeout(() => {
+        removeTyping();
+        showBookingConfirmation(captured);
+      }, TYPING_DELAY);
+      return;
+    }
+
     showTyping();
     setTimeout(() => {
       removeTyping();

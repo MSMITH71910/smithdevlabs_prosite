@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SmithDev Labs — Project Delivery Guide</title>
+<script>
+  (function () {
+    const HASH = '7ea395a101e297f8a8fb42a77c738e1fe0d234005e082d74ef7eadb481edbbc1';
+    if (sessionStorage.getItem('sdl-guide-auth') === HASH) return;
+    document.addEventListener('DOMContentLoaded', function () {
+      const overlay = document.createElement('div');
+      overlay.id = 'guide-gate';
+      overlay.style.cssText = 'position:fixed;inset:0;background:#0f1117;z-index:99999;display:flex;align-items:center;justify-content:center;';
+      overlay.innerHTML = `
+        <div style="background:#1a1d27;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:40px 36px;width:100%;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.5);">
+          <div style="font-size:2.2rem;margin-bottom:10px;">📋</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#f1f5f9;margin-bottom:4px;">SmithDev Labs Delivery Guide</div>
+          <div style="font-size:0.78rem;color:#64748b;margin-bottom:24px;">Owner access only</div>
+          <input id="guide-pw-input" type="password" placeholder="Enter password"
+            style="width:100%;background:#22263a;border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 16px;color:#f1f5f9;font-size:0.95rem;outline:none;margin-bottom:10px;box-sizing:border-box;"
+            onkeydown="if(event.key==='Enter')document.getElementById('guide-pw-btn').click()" />
+          <div id="guide-pw-err" style="color:#ef4444;font-size:0.78rem;margin-bottom:8px;display:none;">Incorrect password — try again.</div>
+          <button id="guide-pw-btn" type="button"
+            style="width:100%;background:#3b82f6;color:white;border:none;border-radius:10px;padding:12px;font-size:0.95rem;font-weight:700;cursor:pointer;">
+            Unlock Guide
+          </button>
+        </div>`;
+      document.body.appendChild(overlay);
+      document.getElementById('guide-pw-input').focus();
+      document.getElementById('guide-pw-btn').addEventListener('click', async function () {
+        const val = document.getElementById('guide-pw-input').value;
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(val));
+        const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+        if (hex === HASH) {
+          sessionStorage.setItem('sdl-guide-auth', HASH);
+          overlay.remove();
+        } else {
+          document.getElementById('guide-pw-err').style.display = 'block';
+          document.getElementById('guide-pw-input').value = '';
+          document.getElementById('guide-pw-input').focus();
+        }
+      });
+    });
+  })();
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--primary:#3b82f6;--green:#22c55e;--yellow:#f59e0b;--purple:#a855f7;--cyan:#06b6d4;--orange:#f97316;--red:#ef4444;--text:#f1f5f9;--muted:#94a3b8;--radius:10px}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border2);padding:12px 20px;display:flex;align-items:center;gap:16px;flex-shrink:0;z-index:100}
+.topbar h1{font-size:1rem;font-weight:800;background:linear-gradient(135deg,#3b82f6,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap}
+.search-wrap{flex:1;max-width:440px;position:relative}
+.search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px 8px 36px;color:var(--text);font-size:.85rem;outline:none;font-family:inherit}
+.search-wrap input:focus{border-color:var(--primary)}
+.search-wrap::before{content:"🔍";position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.8rem}
+.topbar-links{display:flex;gap:8px;margin-left:auto}
+.topbar-link{font-size:.75rem;font-weight:700;color:var(--muted);padding:6px 12px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);text-decoration:none;transition:color .15s}
+.topbar-link:hover{color:var(--text)}
+.btn-print{font-size:.75rem;font-weight:700;color:var(--text);padding:6px 14px;border-radius:7px;background:var(--primary);border:none;cursor:pointer;font-family:inherit}
+/* BODY LAYOUT */
+.body-layout{display:flex;flex:1;overflow:hidden}
+/* SIDEBAR */
+.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--border2);overflow-y:auto;flex-shrink:0;padding:16px 0}
+.sidebar-group{margin-bottom:20px}
+.sidebar-group-title{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;padding:0 16px 8px}
+.sidebar-link{display:block;padding:7px 16px;font-size:.8rem;color:var(--muted);text-decoration:none;transition:all .15s;border-left:2px solid transparent;line-height:1.35}
+.sidebar-link:hover,.sidebar-link.active{color:var(--text);background:rgba(59,130,246,.08);border-left-color:var(--primary)}
+.sidebar-link .badge{display:inline-block;font-size:.6rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:4px;vertical-align:middle}
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:28px 32px}
+/* SECTION */
+.guide-section{margin-bottom:48px;scroll-margin-top:20px}
+.guide-section.hidden{display:none}
+.section-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.section-icon{font-size:2rem;flex-shrink:0;margin-top:2px}
+.section-meta{flex:1}
+.section-cat{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;padding:3px 10px;border-radius:99px;display:inline-block;margin-bottom:8px}
+.section-meta h2{font-size:1.2rem;font-weight:800;margin-bottom:4px}
+.section-meta .section-tagline{font-size:.82rem;color:var(--muted)}
+.section-toggle{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);border-radius:7px;padding:5px 12px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.section-toggle:hover{color:var(--text)}
+.section-body{display:flex;flex-direction:column;gap:20px}
+/* CARDS */
+.info-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:20px}
+.info-card h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.overview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.overview-stat{background:var(--surface2);border-radius:8px;padding:12px;text-align:center}
+.overview-stat .ov-val{font-size:1rem;font-weight:800;margin-bottom:3px}
+.overview-stat .ov-label{font-size:.68rem;color:var(--muted)}
+/* TOOLS */
+.tools-list{display:flex;flex-wrap:wrap;gap:8px}
+.tool-chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:600;text-decoration:none;color:var(--text);transition:border-color .15s}
+.tool-chip:hover{border-color:var(--primary);color:var(--primary)}
+.tool-free{font-size:.58rem;background:rgba(34,197,94,.15);color:#22c55e;border-radius:4px;padding:1px 5px;font-weight:700}
+.tool-paid{font-size:.58rem;background:rgba(245,158,11,.15);color:#f59e0b;border-radius:4px;padding:1px 5px;font-weight:700}
+/* STEPS */
+.steps-list{display:flex;flex-direction:column;gap:10px}
+.step-item{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);transition:border-color .15s}
+.step-item:has(.step-cb:checked){border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04)}
+.step-num{width:26px;height:26px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;color:#fff}
+.step-item:has(.step-cb:checked) .step-num{background:var(--green)}
+.step-content{flex:1}
+.step-title{font-size:.875rem;font-weight:700;margin-bottom:3px}
+.step-detail{font-size:.78rem;color:var(--muted);line-height:1.5}
+.step-cb{width:18px;height:18px;accent-color:var(--green);cursor:pointer;flex-shrink:0;margin-top:4px}
+/* CHECKLIST */
+.check-list{display:flex;flex-direction:column;gap:8px}
+.check-item{display:flex;align-items:flex-start;gap:10px;font-size:.83rem;color:var(--muted);padding:8px 12px;background:var(--surface2);border-radius:7px}
+.check-item input[type=checkbox]{accent-color:var(--green);width:16px;height:16px;flex-shrink:0;margin-top:2px;cursor:pointer}
+.check-item label{cursor:pointer;line-height:1.4}
+/* EMAIL TEMPLATES */
+.template-box{background:#0a0e1a;border:1px solid var(--border2);border-radius:8px;padding:16px 18px;font-size:.8rem;line-height:1.8;color:#c8d6e5;position:relative;white-space:pre-wrap;font-family:'Courier New',monospace}
+.copy-btn{position:absolute;top:10px;right:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit}
+.copy-btn:hover{color:var(--text)}
+/* COLORS */
+.cat-project{background:rgba(59,130,246,.15);color:#60a5fa}
+.cat-addon{background:rgba(168,85,247,.15);color:#c084fc}
+.cat-retainer{background:rgba(34,197,94,.15);color:#4ade80}
+.cat-template{background:rgba(245,158,11,.15);color:#fbbf24}
+/* NO RESULTS */
+.no-results{text-align:center;padding:80px 24px;color:var(--muted)}
+/* PROGRESS BAR */
+.progress-bar-wrap{background:var(--surface2);border-radius:99px;height:6px;overflow:hidden;margin-top:8px}
+.progress-bar{height:100%;background:linear-gradient(90deg,#3b82f6,#22c55e);border-radius:99px;transition:width .4s}
+.progress-label{font-size:.7rem;color:var(--muted);margin-top:5px}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+@media print{.sidebar,.topbar-links,.btn-print,.section-toggle,.step-cb,.copy-btn{display:none!important}.body-layout{display:block}.main{padding:16px}.guide-section.hidden{display:block!important}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>📋 SmithDev Labs — Project Delivery Guide</h1>
+  <div class="search-wrap"><input type="text" id="searchInput" placeholder="Search steps, tools, packages..." oninput="filterSections(this.value)"/></div>
+  <div class="topbar-links">
+    <a href="dashboard.html" class="topbar-link">⚡ Dashboard</a>
+    <a href="crm.html" class="topbar-link">👥 CRM</a>
+    <a href="time-tracker.html" class="topbar-link">⏱️ Time</a>
+    <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+  </div>
+</div>
+<div class="body-layout">
+<nav class="sidebar">
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">📦 Project Packages</div>
+    <a class="sidebar-link" href="#s1">Starter Website <span class="badge" style="background:rgba(59,130,246,.2);color:#60a5fa;">$800</span></a>
+    <a class="sidebar-link" href="#s2">Growth Package <span class="badge" style="background:rgba(34,197,94,.2);color:#4ade80;">$2K</span></a>
+    <a class="sidebar-link" href="#s3">Pro Package <span class="badge" style="background:rgba(245,158,11,.2);color:#fbbf24;">$4K</span></a>
+    <a class="sidebar-link" href="#s4">Enterprise AI <span class="badge" style="background:rgba(239,68,68,.2);color:#f87171;">$10K+</span></a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">🎬 Live Demo Scripts</div>
+    <a class="sidebar-link" href="#demo-starter">Starter Demo (15 min)</a>
+    <a class="sidebar-link" href="#demo-growth">Growth Demo (20 min)</a>
+    <a class="sidebar-link" href="#demo-pro">Pro Demo (25 min)</a>
+    <a class="sidebar-link" href="#demo-enterprise">Enterprise Demo (40 min)</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">🧩 Standalone Add-Ons</div>
+    <a class="sidebar-link" href="#s5">AI Chatbot Only</a>
+    <a class="sidebar-link" href="#s6">Automation Workflow</a>
+    <a class="sidebar-link" href="#s7">Google Business Profile</a>
+    <a class="sidebar-link" href="#s8">AI Content Package</a>
+    <a class="sidebar-link" href="#s9">Email Marketing Setup</a>
+    <a class="sidebar-link" href="#s10">CRM Setup</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">🔄 Monthly Retainers</div>
+    <a class="sidebar-link" href="#s11">Basic Care $300/mo</a>
+    <a class="sidebar-link" href="#s12">Growth Care $500/mo</a>
+    <a class="sidebar-link" href="#s13">Pro AI Care $1K/mo</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">📝 Templates &amp; Scripts</div>
+    <a class="sidebar-link" href="#s14">Client Onboarding Email</a>
+    <a class="sidebar-link" href="#s15">Project Delivery Email</a>
+    <a class="sidebar-link" href="#s16">Monthly Report Template</a>
+    <a class="sidebar-link" href="#s17">Scope Creep Script</a>
+    <a class="sidebar-link" href="#s18">Cold Call → Close Script</a>
+  </div>
+</nav>
+<main class="main" id="mainContent">
+<div id="noResults" class="no-results" style="display:none">🔍 No sections match your search. Try different keywords.</div>
+
+<!-- ==================== SECTION 1: STARTER ==================== -->
+<section class="guide-section" id="s1" data-search="starter website html css netlify github domain hosting seo contact form 800 1500 5 pages beginner demo live google meet screen share">
+<div class="section-header">
+  <div class="section-icon">🌐</div>
+  <div class="section-meta">
+    <span class="section-cat cat-project">Project Package</span>
+    <h2>Starter Website</h2>
+    <div class="section-tagline">5-page professional website — delivered in 5–7 days. Perfect first offer for any local business.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s1-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s1-body">
+  <div class="info-card">
+    <h3>📊 Overview</h3>
+    <div class="overview-grid">
+      <div class="overview-stat"><div class="ov-val" style="color:#60a5fa;">$800–$1,500</div><div class="ov-label">Price Range</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#4ade80;">5–7 Days</div><div class="ov-label">Delivery Time</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#fbbf24;">5 Pages</div><div class="ov-label">Scope</div></div>
+    </div>
+    <p style="margin-top:14px;font-size:.82rem;color:var(--muted);">Best for: local service businesses (plumbers, salons, contractors, restaurants) who have no website or a terrible one. This is your entry-level offer — easy to sell, easy to deliver, great margin.</p>
+  </div>
+  <div class="info-card">
+    <h3>🛠️ Tools You Need</h3>
+    <div class="tools-list">
+      <a href="https://github.com" target="_blank" class="tool-chip">🐙 GitHub <span class="tool-free">FREE</span></a>
+      <a href="https://netlify.com" target="_blank" class="tool-chip">🚀 Netlify <span class="tool-free">FREE</span></a>
+      <a href="https://analytics.google.com" target="_blank" class="tool-chip">📊 Google Analytics <span class="tool-free">FREE</span></a>
+      <a href="https://www.canva.com" target="_blank" class="tool-chip">🎨 Canva Pro <span class="tool-paid">$13/mo</span></a>
+      <a href="https://www.loom.com" target="_blank" class="tool-chip">🎬 Loom <span class="tool-free">FREE</span></a>
+      <a href="https://fonts.google.com" target="_blank" class="tool-chip">✏️ Google Fonts <span class="tool-free">FREE</span></a>
+      <a href="https://unsplash.com" target="_blank" class="tool-chip">📷 Unsplash (stock photos) <span class="tool-free">FREE</span></a>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>📋 Client Intake — Collect This Before You Build</h3>
+    <div class="check-list">
+      <div class="check-item"><input type="checkbox" id="s1i1"><label for="s1i1">Business name, address, phone number, email address</label></div>
+      <div class="check-item"><input type="checkbox" id="s1i2"><label for="s1i2">Logo file (PNG with transparent background preferred) — or note to create one in Canva</label></div>
+      <div class="check-item"><input type="checkbox" id="s1i3"><label for="s1i3">List of all services offered (with short descriptions)</label></div>
+      <div class="check-item"><input type="checkbox" id="s1i4"><label for="s1i4">Service area (city/region) and business hours</label></div>
+      <div class="check-item"><input type="checkbox" id="s1i5"><label for="s1i5">3–6 photos of work/business/team (or approve use of stock photos)</label></div>
+      <div class="check-item"><input type="checkbox" id="s1i6"><label for="s1i6">Brand colors (ask for hex codes or "match our logo/signage")</label></div>
+      <div class="check-item"><input type="checkbox" id="s1i7"><label for="s1i7">Domain name they own — or note that you will buy one ($12/yr on Namecheap)</label></div>
+      <div class="check-item"><input type="checkbox" id="s1i8"><label for="s1i8">Google Business Profile URL (if they have one)</label></div>
+      <div class="check-item"><input type="checkbox" id="s1i9"><label for="s1i9">"About" story — how they started, what makes them different (2–3 sentences fine)</label></div>
+      <div class="check-item"><input type="checkbox" id="s1i10"><label for="s1i10">50% deposit paid via Wave invoice before you start</label></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🔢 Step-by-Step Build Instructions</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Set up GitHub repository</div><div class="step-detail">Go to github.com → New Repository → name it clientname-website → set to Public → Initialize with README. Clone to your computer with: git clone [url]</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Create folder structure</div><div class="step-detail">Inside the repo folder create: /css/style.css, /js/main.js, /images/ folder, then: index.html, services.html, about.html, contact.html, and one optional 5th page (Gallery, FAQ, or Testimonials)</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Build the navbar and footer first</div><div class="step-detail">Create a consistent navbar with logo, nav links, and a CTA button ("Call Now" or "Book Free Estimate"). Build the footer with address, phone, email, and social links. Copy this to all pages — consistency is everything.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s4"><div class="step-num">4</div><div class="step-content"><div class="step-title">Build the Home page (index.html)</div><div class="step-detail">Hero section: big headline, subheadline, 2 CTA buttons ("Call Now" + "Get a Free Quote"). Services overview grid (3–4 cards). Why Choose Us section. Contact/CTA section at bottom.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s5"><div class="step-num">5</div><div class="step-content"><div class="step-title">Build Services page</div><div class="step-detail">List each service with a short description, icon or image, and a bullet list of what's included. End with a CTA: "Ready to get started? Call us today."</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s6"><div class="step-num">6</div><div class="step-content"><div class="step-title">Build About page</div><div class="step-detail">Owner photo (or team photo), business story, years in business, licenses/certifications, service area map or list. Include trust signals: BBB badge, license number, insurance mention.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s7"><div class="step-num">7</div><div class="step-content"><div class="step-title">Build Contact page with Netlify Form</div><div class="step-detail">Add a form with: Name, Email, Phone, Service Needed, Message. Add this to the form tag: data-netlify="true" name="contact". This makes Netlify capture submissions automatically — zero backend needed.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s8"><div class="step-num">8</div><div class="step-content"><div class="step-title">Add Google Analytics</div><div class="step-detail">Go to analytics.google.com → Create property → Get the G-XXXXXXXX tracking ID → Paste the script tag in the &lt;head&gt; of every page. This lets client see how many people visit.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s9"><div class="step-num">9</div><div class="step-content"><div class="step-title">Optimize images</div><div class="step-detail">Go to squoosh.app → Compress every image to under 200KB. Large images slow the site and hurt SEO. Name images descriptively: smith-plumbing-philadelphia.jpg (not IMG_4832.jpg).</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s10"><div class="step-num">10</div><div class="step-content"><div class="step-title">Push to GitHub and deploy on Netlify</div><div class="step-detail">Run: git add -A → git commit -m "Initial build" → git push. Then go to netlify.com → Add new site → Import from Git → Select repo → Deploy. Site goes live in 60 seconds at a random netlify URL.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s11"><div class="step-num">11</div><div class="step-content"><div class="step-title">Connect client's custom domain</div><div class="step-detail">In Netlify → Site Settings → Domain Management → Add custom domain → Enter domain name. Then go to wherever domain is registered (GoDaddy, Namecheap, Google) → DNS settings → Add Netlify's nameservers or CNAME record. Takes 5–30 min to propagate.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s12"><div class="step-num">12</div><div class="step-content"><div class="step-title">Test everything — use the testing checklist below</div><div class="step-detail">Check every page on mobile AND desktop. Submit the contact form and verify you receive the notification email. Check all links work. Run through Google PageSpeed Insights (pagespeed.web.dev) and fix any red issues.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s13"><div class="step-num">13</div><div class="step-content"><div class="step-title">Record a Loom walkthrough video (5–10 min)</div><div class="step-detail">Go to loom.com → Record screen → Walk through every page of the live site. Explain what each section does and how to contact you for changes. This is your professional delivery — clients LOVE it. Share the Loom link in your delivery email.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s1s14"><div class="step-num">14</div><div class="step-content"><div class="step-title">Send delivery email + collect final payment</div><div class="step-detail">Use the Project Delivery Email template (Section 15). Send final 50% Wave invoice at the same time. Do not hand over GitHub repo access until paid in full.</div></div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>✅ Pre-Delivery Testing Checklist</h3>
+    <div class="check-list">
+      <div class="check-item"><input type="checkbox" id="s1t1"><label for="s1t1">Site loads on mobile iPhone + Android (use Chrome DevTools device mode)</label></div>
+      <div class="check-item"><input type="checkbox" id="s1t2"><label for="s1t2">Contact form submits and you receive the notification in Netlify dashboard</label></div>
+      <div class="check-item"><input type="checkbox" id="s1t3"><label for="s1t3">All navigation links work on every page</label></div>
+      <div class="check-item"><input type="checkbox" id="s1t4"><label for="s1t4">Phone number is clickable (tel: link) on mobile</label></div>
+      <div class="check-item"><input type="checkbox" id="s1t5"><label for="s1t5">Images all load — no broken image icons</label></div>
+      <div class="check-item"><input type="checkbox" id="s1t6"><label for="s1t6">SSL certificate active (https:// shows green padlock)</label></div>
+      <div class="check-item"><input type="checkbox" id="s1t7"><label for="s1t7">Google Analytics tracking code is firing (check Real-Time tab)</label></div>
+      <div class="check-item"><input type="checkbox" id="s1t8"><label for="s1t8">Page load speed is under 3 seconds (pagespeed.web.dev)</label></div>
+      <div class="check-item"><input type="checkbox" id="s1t9"><label for="s1t9">Business name, address, phone are accurate on every page</label></div>
+      <div class="check-item"><input type="checkbox" id="s1t10"><label for="s1t10">Footer copyright year is correct</label></div>
+    </div>
+  </div>
+  <div class="info-card" id="demo-starter">
+    <h3>🎬 How to Demo the Starter Package Live (Google Meet — 15 min)</h3>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:16px;">This is your screen-share walkthrough during a cold call Google Meet. Goal: make the client see their OWN business in a finished website so they say yes on the spot.</p>
+    <div class="info-card" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.3);margin-bottom:16px;">
+      <h3 style="color:#fbbf24;">⚡ Set Up BEFORE the Call (10 min prep)</h3>
+      <div class="check-list">
+        <div class="check-item"><input type="checkbox" id="d1p1"><label for="d1p1">Tab 1: Open your live SmithDev Labs site — msmith71910.github.io/smithdevlabs_prosite</label></div>
+        <div class="check-item"><input type="checkbox" id="d1p2"><label for="d1p2">Tab 2: Open a demo client site — use your Starter HTML template with a fake business name like "Rivera's Plumbing"</label></div>
+        <div class="check-item"><input type="checkbox" id="d1p3"><label for="d1p3">Tab 3: Open Canva — create a simple logo mock with the PROSPECT'S business name (takes 2 minutes in Canva)</label></div>
+        <div class="check-item"><input type="checkbox" id="d1p4"><label for="d1p4">Tab 4: Open Google PageSpeed Insights (pagespeed.web.dev) — ready to show site speed score</label></div>
+        <div class="check-item"><input type="checkbox" id="d1p5"><label for="d1p5">Have your Wave invoice app ready with their business name pre-filled so you can send deposit invoice in 60 seconds after they say yes</label></div>
+      </div>
+    </div>
+    <div class="steps-list">
+      <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">0:00 — Open with the big picture (2 min)</div><div class="step-detail">Say: "I'm going to share my screen and show you exactly what I would build for [Business Name]. This takes 15 minutes. Is that okay?" → Share screen → Open your SmithDev Labs site → "This is my portfolio. I build websites, chatbots, and AI systems for local businesses. Let me show you a demo of what I'd build for you."</div></div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">2:00 — Show the demo site (4 min)</div><div class="step-detail">Switch to Tab 2 (the demo Starter site). Walk through slowly: "Here's the hero section — this would say [their tagline]. Here's your services listed out. Here's your About page where customers learn about you. And here's the contact form — when someone fills this out, you get an email instantly." Click through every page slowly. Let it breathe.</div></div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">6:00 — Show it on mobile (2 min)</div><div class="step-detail">Press F12 in Chrome → Click the device toggle icon → Select iPhone 12 → "Every site I build is mobile-first. 70% of your customers are finding you on their phone. This is what they'd see." Scroll through the mobile view slowly. This always impresses clients.</div></div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">8:00 — Show their mock logo in Canva (2 min)</div><div class="step-detail">Switch to Tab 3 (Canva) → Show the logo you already made with their business name → "I put together a quick logo concept for you — this is the kind of thing we'd refine together. You'd own this completely." This is the moment they start imagining it as theirs.</div></div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">10:00 — Submit a live contact form (2 min)</div><div class="step-detail">Go back to the demo site contact page → Fill out the form with your own name → Submit it → "When someone fills this out, you get an email to [their email] immediately. No missed leads." If you have Netlify set up on the demo, show the notification arriving in real time. This is your proof point.</div></div></div>
+      <div class="step-item"><div class="step-num">6</div><div class="step-content"><div class="step-title">12:00 — Close (3 min)</div><div class="step-detail">Stop sharing screen → Look at camera → "So that's exactly what I'd build for [Business Name]. Five pages, mobile-ready, contact form, Google Analytics — all live in 5 days. The investment is $[price] and I just need 50% to get started. I can have the invoice to you in the next 60 seconds. Want to move forward today?"</div></div></div>
+    </div>
+    <div class="template-box" style="margin-top:16px;">
+      <button class="copy-btn" onclick="copyTemplate('close-starter')">Copy</button>
+      <div id="close-starter">OBJECTION: "I need to think about it."
+YOU: "Totally understand. What's the main thing you'd need to think through — the price, the timing, or something else?"
+[Let them answer — then address that one thing specifically.]
+
+OBJECTION: "I already have a website."
+YOU: "Got it. Can I ask — when someone Googles [business type] in [city], does your site show up? And when they land on it, does it make them want to call you? If the answer to either is no, that's exactly what I fix."
+
+OBJECTION: "How do I know it'll actually work?"
+YOU: "That's fair. You're looking at a live example right now — this site is live on the internet today. You can pull it up on your phone after this call. I don't get paid the other 50% until you're happy with it."</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 2: GROWTH ==================== -->
+<section class="guide-section" id="s2" data-search="growth package website chatbot chatbase crm lead capture make.com automation 2000 5000 10 pages demo live google meet screen share airtable">
+<div class="section-header">
+  <div class="section-icon">🚀</div>
+  <div class="section-meta">
+    <span class="section-cat cat-project">Project Package</span>
+    <h2>Growth Package</h2>
+    <div class="section-tagline">10-page website + trained AI chatbot + lead-to-CRM automation. Your best-selling package.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s2-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s2-body">
+  <div class="info-card">
+    <h3>📊 Overview</h3>
+    <div class="overview-grid">
+      <div class="overview-stat"><div class="ov-val" style="color:#4ade80;">$2,000–$5,000</div><div class="ov-label">Price Range</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#4ade80;">7–14 Days</div><div class="ov-label">Delivery Time</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#4ade80;">10 Pages + Chatbot</div><div class="ov-label">Scope</div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🛠️ Tools You Need</h3>
+    <div class="tools-list">
+      <a href="https://github.com" target="_blank" class="tool-chip">🐙 GitHub <span class="tool-free">FREE</span></a>
+      <a href="https://netlify.com" target="_blank" class="tool-chip">🚀 Netlify <span class="tool-free">FREE</span></a>
+      <a href="https://chatbase.co" target="_blank" class="tool-chip">🤖 Chatbase <span class="tool-free">FREE to start</span></a>
+      <a href="https://make.com" target="_blank" class="tool-chip">⚙️ Make.com <span class="tool-free">FREE tier</span></a>
+      <a href="https://airtable.com" target="_blank" class="tool-chip">🗂️ Airtable CRM <span class="tool-free">FREE</span></a>
+      <a href="https://analytics.google.com" target="_blank" class="tool-chip">📊 Google Analytics <span class="tool-free">FREE</span></a>
+      <a href="https://calendly.com" target="_blank" class="tool-chip">📅 Calendly <span class="tool-free">FREE</span></a>
+      <a href="https://www.canva.com" target="_blank" class="tool-chip">🎨 Canva Pro <span class="tool-paid">$13/mo</span></a>
+      <a href="https://www.loom.com" target="_blank" class="tool-chip">🎬 Loom <span class="tool-free">FREE</span></a>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>📋 Client Intake (in addition to Starter intake)</h3>
+    <div class="check-list">
+      <div class="check-item"><input type="checkbox" id="s2i1"><label for="s2i1">Full list of FAQs — every question customers ask on the phone (aim for 20+)</label></div>
+      <div class="check-item"><input type="checkbox" id="s2i2"><label for="s2i2">Pricing info (ranges are fine — "Drain cleaning starts at $150")</label></div>
+      <div class="check-item"><input type="checkbox" id="s2i3"><label for="s2i3">Booking/appointment process — how do clients currently book?</label></div>
+      <div class="check-item"><input type="checkbox" id="s2i4"><label for="s2i4">What CRM or system do they use (if any)? Google Sheets is fine.</label></div>
+      <div class="check-item"><input type="checkbox" id="s2i5"><label for="s2i5">What info do they need from each lead? (name, phone, service type, address?)</label></div>
+      <div class="check-item"><input type="checkbox" id="s2i6"><label for="s2i6">Owner's mobile number for lead alert texts</label></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🔢 Step-by-Step: Website Build (Days 1–7)</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s2s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Build the 10-page website (same as Starter steps 1–12)</div><div class="step-detail">Pages: Home, Services (main), Service Detail pages (2–3 individual service pages), About, Gallery/Portfolio, FAQ, Blog (optional), Contact, Thank You page (after form submit)</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s2s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Create Chatbase account and new chatbot</div><div class="step-detail">Go to chatbase.co → Sign up free → Click "New Chatbot" → Name it after the client's business (e.g. "Rivera's Plumbing Assistant")</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s2s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Upload business knowledge to Chatbase</div><div class="step-detail">In Chatbase → Sources tab → Add Text source → Paste in: all services + descriptions, full FAQ list, pricing info, hours, address, service area, booking instructions. Also add the website URL as a web crawl source.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s2s4"><div class="step-num">4</div><div class="step-content"><div class="step-title">Configure chatbot personality and greeting</div><div class="step-detail">Chatbase → Settings → Instructions: write a system prompt like: "You are [Business Name]'s friendly AI assistant. Answer questions about our services, pricing, and availability. Always be helpful and professional. If asked something you don't know, say: 'Great question! Let me connect you with our team — can I get your name and phone number?'"</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s2s5"><div class="step-num">5</div><div class="step-content"><div class="step-title">Set up lead capture in Chatbase</div><div class="step-detail">Chatbase → Leads tab → Enable lead collection → Set fields: Name (required), Email (required), Phone (required). Set the prompt: "Before I connect you with our team, could I get your name, email, and phone number?"</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s2s6"><div class="step-num">6</div><div class="step-content"><div class="step-title">Build Make.com automation: Chatbase lead → CRM + email alert</div><div class="step-detail">Go to make.com → Create new scenario → Add trigger: Webhooks → Custom webhook (copy the URL) → Paste URL in Chatbase → Integrations → Webhook. Add actions: 1) Gmail → Send email to owner with lead details. 2) Airtable → Create record with Name/Email/Phone/Date columns.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s2s7"><div class="step-num">7</div><div class="step-content"><div class="step-title">Get chatbot embed code and add to all website pages</div><div class="step-detail">Chatbase → Embed tab → Copy the script tag → Paste it just before &lt;/body&gt; on every HTML page. The chat bubble will appear automatically on all pages.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s2s8"><div class="step-num">8</div><div class="step-content"><div class="step-title">Test the chatbot with 15+ real questions</div><div class="step-detail">Ask it: hours, pricing, services, emergency availability, how to book, location, parking, payment methods. Check every answer. Fix bad answers by adding better content to Sources. Submit a test lead and verify it appears in Airtable and triggers owner email.</div></div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>✅ Pre-Delivery Testing Checklist</h3>
+    <div class="check-list">
+      <div class="check-item"><input type="checkbox" id="s2t1"><label for="s2t1">All 10 pages load correctly on mobile and desktop</label></div>
+      <div class="check-item"><input type="checkbox" id="s2t2"><label for="s2t2">Chatbot bubble appears on all pages</label></div>
+      <div class="check-item"><input type="checkbox" id="s2t3"><label for="s2t3">Chatbot answers 10 test questions correctly</label></div>
+      <div class="check-item"><input type="checkbox" id="s2t4"><label for="s2t4">Lead submitted through chatbot → shows in Airtable within 60 seconds</label></div>
+      <div class="check-item"><input type="checkbox" id="s2t5"><label for="s2t5">Owner receives email alert when chatbot captures a lead</label></div>
+      <div class="check-item"><input type="checkbox" id="s2t6"><label for="s2t6">Netlify contact form also works and sends notification</label></div>
+    </div>
+  </div>
+  <div class="info-card" id="demo-growth">
+    <h3>🎬 How to Demo the Growth Package Live (Google Meet — 20 min)</h3>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:16px;">This demo has one WOW moment: the chatbot captures a lead and the client watches it land in a real spreadsheet in real time. That's what closes the deal.</p>
+    <div class="info-card" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.3);margin-bottom:16px;">
+      <h3 style="color:#fbbf24;">⚡ Set Up BEFORE the Call (15 min prep)</h3>
+      <div class="check-list">
+        <div class="check-item"><input type="checkbox" id="d2p1"><label for="d2p1">Tab 1: Your SmithDev Labs site (portfolio/about)</label></div>
+        <div class="check-item"><input type="checkbox" id="d2p2"><label for="d2p2">Tab 2: Demo Growth website (10-page template with fake business name) — have it live on Netlify or GitHub Pages</label></div>
+        <div class="check-item"><input type="checkbox" id="d2p3"><label for="d2p3">Tab 3: Chatbase.co — log into a pre-trained demo chatbot (train it on fake plumber/restaurant FAQs). Have the chat widget open and ready.</label></div>
+        <div class="check-item"><input type="checkbox" id="d2p4"><label for="d2p4">Tab 4: Airtable — open an empty "Leads" table with columns: Name, Email, Phone, Service, Date. This is where the live lead will appear.</label></div>
+        <div class="check-item"><input type="checkbox" id="d2p5"><label for="d2p5">Tab 5: Calendly — your scheduling page ready to show the booking flow</label></div>
+        <div class="check-item"><input type="checkbox" id="d2p6"><label for="d2p6">Make.com scenario set up: Chatbase webhook → Airtable create record. Have it ACTIVE so the demo works live.</label></div>
+      </div>
+    </div>
+    <div class="steps-list">
+      <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">0:00 — Quick site walkthrough (3 min)</div><div class="step-detail">Share screen → Tab 2 (demo site) → Walk through the homepage, services, and about page quickly. "This is the full 10-page website — here's your home page, services, about, FAQ, blog, and contact. All mobile-ready." Hit F12, show mobile view for 30 seconds. Keep it moving.</div></div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">3:00 — Introduce the chatbot (1 min)</div><div class="step-detail">Say: "Now here's where it gets interesting." Click the chat bubble in the corner of the demo site. "See this? This is an AI chatbot trained specifically on this business. Watch what happens when a customer starts typing." Build the suspense before you demo it.</div></div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">4:00 — Live chatbot interaction (5 min)</div><div class="step-detail">Type as a fake customer: (1) "Do you do emergency repairs on weekends?" → show it answer correctly. (2) "What does a water heater replacement cost?" → show it answer. (3) "I'd like to book an appointment — my name is John, phone is 555-0192." → watch it capture the lead. Say: "This is running 24/7. At 2am on a Sunday when you're asleep, customers can still get answers and book."</div></div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">9:00 — THE WOW MOMENT: Show the lead appear in Airtable (2 min)</div><div class="step-detail">WITHOUT closing the chat window, switch to Tab 4 (Airtable) → Refresh the table → The lead from the chatbot conversation (John, 555-0192) appears as a new row. Say: "John just became a lead in your CRM. You didn't do anything. You were asleep. This is automatic." Pause. Let it land. This is the moment deals close.</div></div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">11:00 — Show Calendly booking (3 min)</div><div class="step-detail">Switch to Tab 5 (Calendly) → "Customers can also book directly without even talking to the chatbot. They pick a time, they get a confirmation, and it goes on your calendar automatically." Click through the booking flow. Show the confirmation email. "No phone tag. No missed appointments."</div></div></div>
+      <div class="step-item"><div class="step-num">6</div><div class="step-content"><div class="step-title">14:00 — Show your SmithDev Labs portfolio (2 min)</div><div class="step-detail">Switch to Tab 1 → "Here's my portfolio — these are the types of results I get for clients." Show the portfolio page and testimonials section. Keep it brief — they're already sold on the demo.</div></div></div>
+      <div class="step-item"><div class="step-num">7</div><div class="step-content"><div class="step-title">16:00 — Close (4 min)</div><div class="step-detail">Stop screen share → "So that's the Growth Package. You get the full 10-page website, a chatbot that answers questions and captures leads 24/7, and every lead automatically saved to your CRM. Nothing falls through the cracks. Investment is $[price] and I need 50% to start. Ready to get this built for [Business Name]?"</div></div></div>
+    </div>
+    <div class="template-box" style="margin-top:16px;">
+      <button class="copy-btn" onclick="copyTemplate('close-growth')">Copy</button>
+      <div id="close-growth">OBJECTION: "Is the chatbot going to say the wrong thing?"
+YOU: "Great question. I train it specifically on your business — your services, your prices, your FAQs. Before it goes live, you test it yourself and tell me anything it gets wrong. I fix it until you're confident. And you can always update it later."
+
+OBJECTION: "What if I want to change something on the site?"
+YOU: "You just text or email me. Changes are included for the first 30 days. After that I have a $[retainer price]/month support plan that covers unlimited small changes."
+
+OBJECTION: "That's more than I was expecting to spend."
+YOU: "I get that. Think about it this way — if this chatbot books you just ONE extra job a month, and your average job is $[X], the site pays for itself in [Y] months. After that it's pure profit, running 24/7 for free."</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 3: PRO ==================== -->
+<section class="guide-section" id="s3" data-search="pro package automation make.com n8n review request appointment reminder email sequence follow up 4000 10000 demo live google meet sms twilio screen share">
+<div class="section-header">
+  <div class="section-icon">⚙️</div>
+  <div class="section-meta">
+    <span class="section-cat cat-project">Project Package</span>
+    <h2>Pro Package</h2>
+    <div class="section-tagline">Everything in Growth PLUS automation workflows — review requests, appointment reminders, lead follow-up sequences.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s3-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s3-body">
+  <div class="info-card">
+    <h3>📊 Overview</h3>
+    <div class="overview-grid">
+      <div class="overview-stat"><div class="ov-val" style="color:#fbbf24;">$4,000–$10,000</div><div class="ov-label">Price Range</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#fbbf24;">14–21 Days</div><div class="ov-label">Delivery Time</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#fbbf24;">4 Automations</div><div class="ov-label">Scope Adds</div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🛠️ Additional Tools for Pro</h3>
+    <div class="tools-list">
+      <a href="https://make.com" target="_blank" class="tool-chip">⚙️ Make.com Core <span class="tool-free">FREE tier</span></a>
+      <a href="https://www.twilio.com" target="_blank" class="tool-chip">📱 Twilio SMS <span class="tool-paid">~$0.01/text</span></a>
+      <a href="https://mailchimp.com" target="_blank" class="tool-chip">📧 Mailchimp <span class="tool-free">FREE &lt;500</span></a>
+      <a href="https://airtable.com" target="_blank" class="tool-chip">🗂️ Airtable <span class="tool-free">FREE</span></a>
+      <a href="https://calendly.com" target="_blank" class="tool-chip">📅 Calendly <span class="tool-free">FREE</span></a>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🔢 Automation 1: Lead Form → Owner SMS + CRM Entry</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a1s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Set up Twilio account</div><div class="step-detail">Go to twilio.com → Sign up → Buy a local phone number ($1/mo) → Get Account SID and Auth Token from dashboard. These are your API credentials.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a1s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Create Make.com scenario: Webhook → Parse data → SMS + Airtable</div><div class="step-detail">Trigger: Webhooks → Custom webhook. Actions: 1) Twilio → Send SMS to owner: "New lead! Name: {{name}}, Phone: {{phone}}, Service: {{service}}". 2) Airtable → Create record. Connect Netlify form webhook URL to this scenario.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a1s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Test: Submit website contact form → verify SMS arrives in under 60 seconds</div><div class="step-detail">Use a real phone number for testing. Check Make.com execution history to see if the scenario ran. If it failed, check the error message in Make.com.</div></div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🔢 Automation 2: Job Complete → Google Review Request</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a2s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Get client's Google Business Profile review link</div><div class="step-detail">Go to Google Maps → Search their business → Click "Write a review" → Copy the URL. Shorten it with bit.ly. This is what you send customers.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a2s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Create Make.com scenario triggered by Airtable status change</div><div class="step-detail">Trigger: Airtable → Watch Records → When "Status" field changes to "Job Complete". Actions: 1) Twilio → Send SMS to customer: "Hi {{name}}, thanks for choosing [Business]! If we did a great job, would you mind leaving us a quick Google review? It really helps: [link]". 2) Gmail → Send same message as email.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a2s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Train client how to mark jobs as "Complete" in Airtable</div><div class="step-detail">Record a 2-minute Loom video showing: open Airtable → find client row → change Status dropdown to "Job Complete" → automation fires. This is their one step to trigger the review request.</div></div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🔢 Automation 3: Appointment Confirmation + 24hr Reminder</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a3s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Connect Calendly to Make.com</div><div class="step-detail">Make.com → New scenario → Trigger: Calendly → Watch Events (new booking). This fires every time someone books an appointment through Calendly.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a3s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Send immediate confirmation SMS + email</div><div class="step-detail">Action: Twilio SMS: "Hi {{invitee_name}}, your appointment with [Business] is confirmed for {{start_time}}. Address: [address]. Questions? Call [phone]. See you then!" Also send Gmail confirmation email.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a3s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Schedule 24-hour reminder</div><div class="step-detail">Add a Sleep module set to 23 hours (Make.com can pause scenarios). After 23 hours: Twilio SMS: "Reminder: Your appointment with [Business] is tomorrow at {{start_time}}. Address: [address]. Reply CANCEL to cancel or call [phone]."</div></div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🔢 Automation 4: 3-Email Lead Follow-Up Sequence</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a4s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Set up Mailchimp audience and email templates</div><div class="step-detail">Mailchimp → Audience → Create audience "New Leads". Create 3 email templates: Day 1 (intro + offer), Day 3 (follow-up + FAQ), Day 7 (last chance + testimonial).</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a4s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Build Make.com scenario to add leads to Mailchimp sequence</div><div class="step-detail">Trigger: Webhooks (same webhook as lead form). Action: Mailchimp → Add/Update Subscriber → Add to "New Leads" audience → Tag as "new-lead". The Mailchimp automation sequence fires from there.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s3a4s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Build Mailchimp Customer Journey automation</div><div class="step-detail">Mailchimp → Automations → Customer Journeys → Starting point: Tag added "new-lead" → Send Email 1 immediately → Wait 2 days → Send Email 2 → Wait 4 days → Send Email 3. Activate the journey.</div></div></div>
+    </div>
+  </div>
+  <div class="info-card" id="demo-pro">
+    <h3>🎬 How to Demo the Pro Package Live (Google Meet — 25 min)</h3>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:16px;">The Pro demo has TWO live moments: (1) submitting a form and watching an SMS arrive on your actual phone and (2) marking a job complete and watching a Google review request fire. These two moments justify the price every time.</p>
+    <div class="info-card" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.3);margin-bottom:16px;">
+      <h3 style="color:#fbbf24;">⚡ Set Up BEFORE the Call (20 min prep)</h3>
+      <div class="check-list">
+        <div class="check-item"><input type="checkbox" id="d3p1"><label for="d3p1">All tabs from the Growth demo (site, chatbot, Airtable, Calendly)</label></div>
+        <div class="check-item"><input type="checkbox" id="d3p2"><label for="d3p2">Tab 5: Make.com — open the "Lead → Owner SMS" scenario in the editor view (the visual canvas looks impressive even when idle)</label></div>
+        <div class="check-item"><input type="checkbox" id="d3p3"><label for="d3p3">Tab 6: Airtable — open the leads table with one row already there, Status = "In Progress"</label></div>
+        <div class="check-item"><input type="checkbox" id="d3p4"><label for="d3p4">YOUR PHONE: Have it on the desk, volume up, visible on camera. Twilio SMS automation must be ACTIVE.</label></div>
+        <div class="check-item"><input type="checkbox" id="d3p5"><label for="d3p5">Test the SMS automation before the call — fill out the demo contact form and verify you receive the SMS. If it fails, troubleshoot Make.com before the call.</label></div>
+        <div class="check-item"><input type="checkbox" id="d3p6"><label for="d3p6">Tab 7: Mailchimp — open the 3-email follow-up sequence in Customer Journeys view (show the visual flow)</label></div>
+      </div>
+    </div>
+    <div class="steps-list">
+      <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">0:00 — Fast site + chatbot recap (5 min)</div><div class="step-detail">Share screen → Run the Growth demo steps 1–3 but faster (5 min total). You're warming them up for the automation reveal. "You've seen the site and chatbot. Now let me show you what makes the Pro package completely different from anything else out there."</div></div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">5:00 — Show Make.com (the visual wow) (2 min)</div><div class="step-detail">Switch to Tab 5 (Make.com). Show the scenario canvas — the connected bubbles and arrows. "This is what's running behind the scenes. Every time something happens on your website, this triggers a chain of actions automatically. Watch what happens when I submit a real lead right now."</div></div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">7:00 — LIVE TEST 1: Submit a lead → SMS arrives on your phone (3 min)</div><div class="step-detail">Switch to the demo site contact page → Fill it out with a fake name → Submit → Point your camera at your phone or say "Watch my phone..." → Within 30–60 seconds the SMS arrives: "New lead! Name: [fake name], Phone: [number], Service: [service]." → Say: "That just went to your phone. While we were on this call, you just got notified of a new customer." This is the #1 closing moment in this demo. Pause and let them react.</div></div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">10:00 — Show the lead in Airtable CRM (1 min)</div><div class="step-detail">Switch to Tab 6 (Airtable) → Show the new lead row that just appeared from the form submission → "And it's automatically in your CRM. No copy-pasting. No manual entry. It's just there."</div></div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">11:00 — LIVE TEST 2: Mark job complete → Review request fires (4 min)</div><div class="step-detail">In Airtable → Find the existing row (Status: "In Progress") → Change the Status dropdown to "Job Complete" → Say: "I'm going to change this to Job Complete — like you would after finishing a job — and watch what happens." → Wait 30–60 sec → Show the Make.com scenario ran → Say: "The customer just got a text asking them to leave a Google review, automatically. You didn't do a thing." If Twilio SMS fires, point to your phone again.</div></div></div>
+      <div class="step-item"><div class="step-num">6</div><div class="step-content"><div class="step-title">15:00 — Show the 3-email follow-up sequence (3 min)</div><div class="step-detail">Switch to Tab 7 (Mailchimp Customer Journeys) → Show the visual flow: Email 1 → Wait 2 days → Email 2 → Wait 4 days → Email 3 → "Every lead that comes in gets automatically followed up by email over 7 days. Most businesses never follow up past the first call. Your competitors are leaving money on the table. This captures it for you."</div></div></div>
+      <div class="step-item"><div class="step-num">7</div><div class="step-content"><div class="step-title">18:00 — Show appointment confirmation automation (2 min)</div><div class="step-detail">Switch to Calendly → "When someone books through your site, they get an instant confirmation text and a reminder the day before. No-show rate drops dramatically." Show the email/SMS confirmations you have set up.</div></div></div>
+      <div class="step-item"><div class="step-num">8</div><div class="step-content"><div class="step-title">20:00 — ROI breakdown (2 min)</div><div class="step-detail">Say: "Let me ask you something. How many leads do you miss per week because you couldn't answer the phone? How many jobs never left a Google review even though the customer was happy? How many follow-up emails never got sent? That's the money we're capturing. The investment for all of this is $[price]."</div></div></div>
+      <div class="step-item"><div class="step-num">9</div><div class="step-content"><div class="step-title">22:00 — Close (3 min)</div><div class="step-detail">Stop screen share → "That's the Pro Package. Site, chatbot, lead-to-SMS, CRM, 3-email follow-up, appointment reminders, and review requests — all running while you sleep. $[price], 50% to start, live in 14–21 days. Ready to move forward?"</div></div></div>
+    </div>
+    <div class="template-box" style="margin-top:16px;">
+      <button class="copy-btn" onclick="copyTemplate('close-pro')">Copy</button>
+      <div id="close-pro">OBJECTION: "I don't have time to learn all these tools."
+YOU: "You don't learn them. I build everything and I handle all the technical setup. Your one job is: mark jobs complete in a simple spreadsheet. That's it. I'll record a 2-minute video showing you exactly how."
+
+OBJECTION: "What happens if something breaks?"
+YOU: "That's what the monthly retainer is for. For $[price]/month I monitor everything, fix any issues, and make sure it's always running. But honestly these tools — Make.com, Airtable, Twilio — they're enterprise-grade. They don't break."
+
+OBJECTION: "Can I start with just the Growth and upgrade later?"
+YOU: "Absolutely. A lot of clients do that. Start at $[Growth price], get comfortable with the site and chatbot, then we add the automations in the next phase. Want me to put together the Growth package proposal?"</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 4: ENTERPRISE AI ==================== -->
+<section class="guide-section" id="s4" data-search="enterprise ai agent voiceflow openai api n8n hubspot crm custom 10000 25000 30 days demo live google meet discovery call screen share">
+<div class="section-header">
+  <div class="section-icon">🧠</div>
+  <div class="section-meta">
+    <span class="section-cat cat-project">Project Package</span>
+    <h2>Enterprise AI Package</h2>
+    <div class="section-tagline">Custom AI agents, full automation suites, advanced chatbots, and complete digital transformation. Your premium flagship offer.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s4-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s4-body">
+  <div class="info-card">
+    <h3>📊 Overview</h3>
+    <div class="overview-grid">
+      <div class="overview-stat"><div class="ov-val" style="color:#f87171;">$10,000–$25,000+</div><div class="ov-label">Price Range</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#f87171;">30+ Days</div><div class="ov-label">Delivery Time</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#f87171;">Full AI Suite</div><div class="ov-label">Scope</div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🛠️ Tools You Need</h3>
+    <div class="tools-list">
+      <a href="https://platform.openai.com" target="_blank" class="tool-chip">🌿 OpenAI API <span class="tool-paid">Pay per use</span></a>
+      <a href="https://voiceflow.com" target="_blank" class="tool-chip">🎙️ Voiceflow <span class="tool-paid">$40/mo</span></a>
+      <a href="https://n8n.io" target="_blank" class="tool-chip">🔄 n8n <span class="tool-free">Free self-host</span></a>
+      <a href="https://hubspot.com" target="_blank" class="tool-chip">📊 HubSpot CRM <span class="tool-free">FREE tier</span></a>
+      <a href="https://relevanceai.com" target="_blank" class="tool-chip">🤖 Relevance AI <span class="tool-paid">$19/mo</span></a>
+      <a href="https://airtable.com" target="_blank" class="tool-chip">🗂️ Airtable <span class="tool-free">FREE</span></a>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🔢 Enterprise Delivery Steps</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Deep discovery call (60 minutes)</div><div class="step-detail">Record the call (with permission). Map every step of their current business process: how leads come in, how they're handled, what manual tasks happen daily, what software they use, what they wish was automated. This call drives the entire project scope.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Write a Project Scope Document</div><div class="step-detail">1–2 page Google Doc listing: every deliverable, every tool, timeline with milestones, payment schedule (25% deposit, 25% at midpoint, 50% on delivery), and what is NOT included. Get client signature before starting.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Build the AI agent in Voiceflow</div><div class="step-detail">Voiceflow → New Project → Design the conversation flow: greeting → intent detection (what does user want?) → branch by intent → connect OpenAI API for complex answers → fallback to human escalation. Test every branch.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s4"><div class="step-num">4</div><div class="step-content"><div class="step-title">Connect OpenAI API for generative responses</div><div class="step-detail">OpenAI platform → Create API key → In Voiceflow → Integrations → OpenAI → Paste key → Use GPT-4o model → Write system prompt specific to client business. This gives the chatbot the ability to answer questions it wasn't explicitly trained on.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s5"><div class="step-num">5</div><div class="step-content"><div class="step-title">Build n8n automation suite (4+ workflows)</div><div class="step-detail">Install n8n (cloud at n8n.cloud FREE tier or self-host on DigitalOcean $6/mo). Build: lead routing, CRM sync, appointment management, review requests, email sequences, reporting. Each workflow is a separate n8n workflow with its own trigger.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s6"><div class="step-num">6</div><div class="step-content"><div class="step-title">Set up HubSpot CRM with custom pipeline</div><div class="step-detail">HubSpot → Create pipeline stages matching client's sales process → Import existing contacts → Set up deal stages → Connect n8n to auto-create/update deals when leads come in → Set up email tracking.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s7"><div class="step-num">7</div><div class="step-content"><div class="step-title">Full QA testing (3–5 days)</div><div class="step-detail">Test every automation with real data. Have client test it themselves and report issues. Fix everything before final delivery. Document every workflow in a shared Google Doc.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s8"><div class="step-num">8</div><div class="step-content"><div class="step-title">Client training session (60–90 min Google Meet)</div><div class="step-detail">Walk through every tool. Show them how to: add leads to CRM, mark jobs complete, view chatbot conversations, check automation logs. Record the session and share the recording. This is part of your delivery.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s9"><div class="step-num">9</div><div class="step-content"><div class="step-title">Hand off documentation package</div><div class="step-detail">Create a Google Drive folder with: 1) System overview PDF, 2) Login credentials doc (share securely via LastPass or 1Password), 3) "How to use" Loom videos for each tool, 4) Emergency contact (you) for issues. This is what justifies the premium price.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s4s10"><div class="step-num">10</div><div class="step-content"><div class="step-title">Transition to Pro AI Care retainer</div><div class="step-detail">Every Enterprise client should roll onto the $1,000–$2,000/mo Pro AI Care retainer. Present this during delivery: "These systems need monthly tuning. Here's how we keep everything running perfectly..."</div></div></div>
+    </div>
+  </div>
+  <div class="info-card" id="demo-enterprise">
+    <h3>🎬 How to Demo the Enterprise AI Package (Google Meet — 2 Calls)</h3>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:16px;">Enterprise is NEVER sold in one call. It's a 2-call process: Call 1 = Discovery (you listen, they talk), Call 2 = Custom demo built around their specific problems. The demo you show on Call 2 should already be half-built for their business.</p>
+    <div class="info-card" style="background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.3);margin-bottom:16px;">
+      <h3 style="color:#f87171;">📞 Call 1: Discovery (45–60 min) — You Ask, They Talk</h3>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px;">Your goal on Call 1 is to say as little as possible and learn everything about their business. Record the call (ask permission). Take notes in your CRM. Use this exact question framework:</p>
+      <div class="check-list">
+        <div class="check-item"><input type="checkbox" id="d4d1"><label for="d4d1">"Walk me through how a new customer finds you and becomes a paying client — every step." (Maps their lead funnel)</label></div>
+        <div class="check-item"><input type="checkbox" id="d4d2"><label for="d4d2">"What are the 3 most time-consuming manual tasks your team does every week?" (Identifies automation targets)</label></div>
+        <div class="check-item"><input type="checkbox" id="d4d3"><label for="d4d3">"What software or tools are you currently using?" (Identifies integration points)</label></div>
+        <div class="check-item"><input type="checkbox" id="d4d4"><label for="d4d4">"What's the biggest bottleneck stopping you from growing right now?" (This is what you solve)</label></div>
+        <div class="check-item"><input type="checkbox" id="d4d5"><label for="d4d5">"If I could wave a magic wand and fix one thing in your business tomorrow, what would it be?" (This is your project anchor)</label></div>
+        <div class="check-item"><input type="checkbox" id="d4d6"><label for="d4d6">End Call 1 with: "Based on everything you've told me, I'm going to put together a custom AI system designed specifically for your business. Can we meet again in 3–5 days? I'll have something to show you."</label></div>
+      </div>
+    </div>
+    <div class="info-card" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.3);margin-bottom:16px;">
+      <h3 style="color:#fbbf24;">⚡ Between Calls 1 and 2 — Build Their Custom Demo (3–5 days)</h3>
+      <div class="check-list">
+        <div class="check-item"><input type="checkbox" id="d4b1"><label for="d4b1">In Voiceflow: start a new project named "[Client Business] AI Agent" — build the first 2–3 conversation flows based on their top pain points from the discovery call</label></div>
+        <div class="check-item"><input type="checkbox" id="d4b2"><label for="d4b2">In n8n or Make.com: build a visual workflow diagram (even if it's not fully connected) showing their specific automation chain — label nodes with their actual business steps</label></div>
+        <div class="check-item"><input type="checkbox" id="d4b3"><label for="d4b3">In HubSpot: set up a free CRM with their company name, a custom pipeline using their exact stage names (e.g. "New Inquiry → Quoted → Scheduled → Completed → Invoiced")</label></div>
+        <div class="check-item"><input type="checkbox" id="d4b4"><label for="d4b4">Build a 2-slide Google Slides ROI deck: Slide 1 = their current process (manual, slow, leaky), Slide 2 = the AI-powered future (automated, fast, nothing missed)</label></div>
+        <div class="check-item"><input type="checkbox" id="d4b5"><label for="d4b5">Write the Project Scope Document: every deliverable, every tool, 3-milestone payment schedule (25% / 25% / 50%), what is NOT included — this becomes your contract</label></div>
+      </div>
+    </div>
+    <div class="steps-list">
+      <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">0:00 — Recap what they told you (3 min)</div><div class="step-detail">Share screen → Open your notes from Call 1 → "Last time you told me your biggest challenges were [X, Y, Z]. I've been building a custom solution around exactly those three things. Let me show you what I've put together." This proves you listened. It's the most powerful thing you can do.</div></div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">3:00 — ROI slide first (2 min)</div><div class="step-detail">Open the 2-slide Google Slides deck → Slide 1: "This is your business right now — manual follow-up, leads falling through cracks, no automated review requests..." → Slide 2: "This is what I'm building — every step automated, nothing missed." Then: "Let me show you the actual tools."</div></div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">5:00 — Live Voiceflow AI agent demo (10 min)</div><div class="step-detail">Open Voiceflow → Click "Test" → Run through the conversation flow you built for their business → Have them type in questions as if they were a customer of their OWN business → Let them interact with it. Say: "This is their first impression of your business at 2am. It knows your services, your pricing, your process. It captures their info and books them in." Let them play with it for a few minutes — this is your most impressive tool.</div></div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">15:00 — Show the automation workflow canvas (5 min)</div><div class="step-detail">Switch to n8n or Make.com → Show the visual canvas with their business's actual node names → "This is your entire operation automated. Every new lead flows here → gets added to your CRM → owner gets notified → follow-up emails go out → job complete triggers review request." Walk through each node slowly. The visual complexity is impressive even if some nodes aren't fully connected yet.</div></div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">20:00 — Show HubSpot CRM (5 min)</div><div class="step-detail">Switch to HubSpot → Show the custom pipeline with their stage names → Show a sample deal card with their business fields → "This is your sales pipeline. Every lead that comes in through the website, the chatbot, or a phone call gets tracked right here. You can see every deal, where it is, when it was last touched, and what's next." This resonates with business owners who feel disorganized.</div></div></div>
+      <div class="step-item"><div class="step-num">6</div><div class="step-content"><div class="step-title">25:00 — Walk through the Scope Document (5 min)</div><div class="step-detail">Switch to the Google Doc → "I put together a full scope document for what I'd build for you. Everything is in here — every deliverable, every tool, the timeline, and the payment structure." Read through the key deliverables line by line. Let them ask questions. This is what separates you from someone they found on Upwork.</div></div></div>
+      <div class="step-item"><div class="step-num">7</div><div class="step-content"><div class="step-title">30:00 — ROI calculation (5 min)</div><div class="step-detail">Ask: "What's your average job or contract worth?" [They answer] → "And how many leads do you think you're losing per week right now because of slow follow-up or missed calls?" [They answer] → Do the math live: "[Leads lost] × [avg job value] × 52 weeks = $[annual lost revenue]. My system captures most of that. The investment is $[price]. At that rate, it pays for itself in [X] weeks/months." Write it on screen in a notes app so they can see it.</div></div></div>
+      <div class="step-item"><div class="step-num">8</div><div class="step-content"><div class="step-title">35:00 — Close (5–10 min)</div><div class="step-detail">Stop screen share → "I've built the foundation of this system already — you just saw it. To finish it and get it live, I need a 25% deposit of $[amount] to start. We'll have milestone check-ins at the 25% and 75% mark. I'll have everything live within 30 days. Do you want to move forward today and get the deposit invoice?"</div></div></div>
+    </div>
+    <div class="template-box" style="margin-top:16px;">
+      <button class="copy-btn" onclick="copyTemplate('close-enterprise')">Copy</button>
+      <div id="close-enterprise">OBJECTION: "This is a big investment. I need board/partner approval."
+YOU: "Totally understand. Would it help if I prepared a one-page summary you can share with them? I can have that to you by tomorrow. In the meantime, can we pencil in a follow-up call for when you've had a chance to discuss it?"
+
+OBJECTION: "We tried something like this before and it didn't work."
+YOU: "I hear that a lot. Can I ask what happened? [Let them explain.] The reason most implementations fail is they use generic tools without customizing them to the business. Everything I showed you today — the pipeline stages, the chatbot flows, the automation labels — they're all built around YOUR specific process. That's the difference."
+
+OBJECTION: "What if we want to take it in-house eventually?"
+YOU: "That's fine and I'll help you do it. I document everything — every workflow, every integration, every login. At any point you can hand it off to an internal team. That's actually a sign of success. In the meantime, I'll manage it and keep it optimized."
+
+FINAL CLOSE LINE:
+"You came to this call because something in your business needs to change. I've built the system that fixes it. The only question is when. It's $[deposit] to start. Shall I send the invoice now?"</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 5: STANDALONE CHATBOT ==================== -->
+<section class="guide-section" id="s5" data-search="standalone chatbot only embed wordpress wix squarespace shopify 500 3000 chatbase voiceflow">
+<div class="section-header">
+  <div class="section-icon">💬</div>
+  <div class="section-meta">
+    <span class="section-cat cat-addon">Standalone Add-On</span>
+    <h2>Standalone AI Chatbot</h2>
+    <div class="section-tagline">Add an AI chatbot to any existing website. Works on WordPress, Wix, Squarespace, Shopify, and any HTML site.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s5-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s5-body">
+  <div class="info-card">
+    <h3>📊 Overview</h3>
+    <div class="overview-grid">
+      <div class="overview-stat"><div class="ov-val" style="color:#c084fc;">$500–$3,000</div><div class="ov-label">Price Range</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#c084fc;">&lt; 24 Hours</div><div class="ov-label">Delivery Time</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#c084fc;">Any Platform</div><div class="ov-label">Works On</div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🔢 Build Steps (same as Growth chatbot section, then embed)</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s5s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Build and train chatbot in Chatbase (see Growth Section steps 2–6)</div><div class="step-detail">Complete the full chatbot build including personality, knowledge base, lead capture, and Make.com integration before embedding.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s5s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Embed on HTML website</div><div class="step-detail">Chatbase → Embed → Copy script tag → Open client's HTML files → Paste the script just before &lt;/body&gt; on every page → git push → Done.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s5s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Embed on WordPress</div><div class="step-detail">Option A (Plugin): Install "Insert Headers and Footers" plugin → Paste Chatbase script in Footer section → Save. Option B (Theme): Appearance → Theme Editor → footer.php → paste before &lt;/body&gt; → Save. Test immediately after.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s5s4"><div class="step-num">4</div><div class="step-content"><div class="step-title">Embed on Wix</div><div class="step-detail">Wix Editor → Settings → Custom Code → Head Code → Paste Chatbase script → Apply to All Pages → Save → Publish. The chatbot appears after publish (not in editor preview).</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s5s5"><div class="step-num">5</div><div class="step-content"><div class="step-title">Embed on Squarespace</div><div class="step-detail">Pages → Not Linked → Code Injection (or Settings → Advanced → Code Injection) → Footer section → Paste Chatbase script → Save. Publish and test on live site.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s5s6"><div class="step-num">6</div><div class="step-content"><div class="step-title">Embed on Shopify</div><div class="step-detail">Online Store → Themes → Edit Code → Layout → theme.liquid → Find &lt;/body&gt; → Paste Chatbase script before it → Save. Test on live store.</div></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 6: AUTOMATION ==================== -->
+<section class="guide-section" id="s6" data-search="automation workflow make.com n8n lead CRM review appointment email invoice 500 1500">
+<div class="section-header">
+  <div class="section-icon">🔄</div>
+  <div class="section-meta">
+    <span class="section-cat cat-addon">Standalone Add-On</span>
+    <h2>Automation Workflow</h2>
+    <div class="section-tagline">Build individual automation workflows. $500–$1,500 each. Use Make.com for most clients.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s6-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s6-body">
+  <div class="info-card">
+    <h3>🔢 The 5 Most Common Automations (Steps for Each)</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s6s1"><div class="step-num">A</div><div class="step-content"><div class="step-title">Lead Capture → CRM + Owner Alert</div><div class="step-detail">Make.com: Webhook trigger (paste URL in website form) → Parse JSON → Google Sheets or Airtable: add row → Gmail: send alert to owner → Twilio: send SMS alert. Test: submit form → verify all 3 outputs within 60 seconds. Price: $500.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s6s2"><div class="step-num">B</div><div class="step-content"><div class="step-title">Google Review Request (Post-Job)</div><div class="step-detail">Make.com: Airtable trigger (status = "Complete") → Twilio SMS to customer with Google review link → Gmail backup email. Get GBP review link from Google Maps → shorten with bit.ly. Price: $500.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s6s3"><div class="step-num">C</div><div class="step-content"><div class="step-title">Appointment Confirmation + Reminder</div><div class="step-detail">Make.com: Calendly trigger (new booking) → Twilio SMS confirmation immediately → Sleep 23 hours → Twilio SMS reminder. Also Gmail confirmation email. Price: $700.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s6s4"><div class="step-num">D</div><div class="step-content"><div class="step-title">Automatic Invoice/Quote Generation</div><div class="step-detail">Make.com: Webhook or form trigger → Parse data → Google Docs template fill-in (using Google Docs module) → Convert to PDF → Gmail: send PDF to client. Set up Google Doc with {{name}}, {{service}}, {{price}} placeholders. Price: $800.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s6s5"><div class="step-num">E</div><div class="step-content"><div class="step-title">Email Follow-Up Drip Sequence (3 emails)</div><div class="step-detail">Make.com: Webhook trigger (new lead) → Mailchimp: add to audience with tag "new-lead". In Mailchimp: Customer Journey → tag trigger → Email 1 (instant) → 2-day wait → Email 2 → 4-day wait → Email 3. Write all 3 emails in Mailchimp. Price: $800.</div></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 7: GBP ==================== -->
+<section class="guide-section" id="s7" data-search="google business profile local seo maps listing review optimization 200 400">
+<div class="section-header">
+  <div class="section-icon">📍</div>
+  <div class="section-meta">
+    <span class="section-cat cat-addon">Standalone Add-On</span>
+    <h2>Google Business Profile Setup</h2>
+    <div class="section-tagline">Optimize their Google Maps listing so they show up when local customers search. Fast win, easy money.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s7-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s7-body">
+  <div class="info-card">
+    <h3>📊 Overview</h3>
+    <div class="overview-grid">
+      <div class="overview-stat"><div class="ov-val" style="color:#c084fc;">$200–$400</div><div class="ov-label">Price</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#c084fc;">1–2 Days</div><div class="ov-label">Delivery</div></div>
+      <div class="overview-stat"><div class="ov-val" style="color:#c084fc;">1× Setup</div><div class="ov-label">Type</div></div>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>🔢 Step-by-Step GBP Optimization</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s7s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Claim or verify the Google Business Profile</div><div class="step-detail">Go to business.google.com → Search their business → Claim it. If already claimed, get access from client. Verification: Google will mail a postcard (5–14 days) OR instant phone/email verify if eligible.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s7s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Fill out every single field</div><div class="step-detail">Business name (exact legal name), Category (be very specific — "Emergency Plumber" not just "Plumber"), Address, Hours (include holiday hours), Phone, Website, Description (750 chars — use keywords like city name + service). Do NOT skip anything.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s7s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Upload 10+ high-quality photos</div><div class="step-detail">Exterior photo, interior photo, team photo, before/after work photos, logo. Google ranks profiles with more photos higher. Use real photos if available; Canva for branded graphics otherwise.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s7s4"><div class="step-num">4</div><div class="step-content"><div class="step-title">Add all services with descriptions and prices</div><div class="step-detail">GBP → Products/Services → Add each service with name, description (keyword-rich), and optional price range. This directly impacts what searches they show up for.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s7s5"><div class="step-num">5</div><div class="step-content"><div class="step-title">Set up Q&A section with common questions</div><div class="step-detail">GBP → Q&A → Add your own questions and answer them: "Do you offer emergency service?" "What areas do you serve?" "Are you licensed and insured?" Pre-seeding Q&A helps SEO and looks professional.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s7s6"><div class="step-num">6</div><div class="step-content"><div class="step-title">Get 5 real reviews from existing customers immediately</div><div class="step-detail">Ask client for 5 past customer phone numbers → Text them personally: "Hey [Name], I just updated our Google listing. Would you mind leaving us a quick review? Here's the link: [bit.ly link]. It takes 30 seconds and really helps us!" Do this before you consider the job done.</div></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 8: AI CONTENT ==================== -->
+<section class="guide-section" id="s8" data-search="generative ai content blog social media posts captions email openai gpt make.com 300 700">
+<div class="section-header">
+  <div class="section-icon">✍️</div>
+  <div class="section-meta">
+    <span class="section-cat cat-addon">Standalone Add-On</span>
+    <h2>AI Content Package</h2>
+    <div class="section-tagline">Set up a system that auto-generates blog posts, social captions, and emails using OpenAI + Make.com. Ongoing value, easy upsell.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s8-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s8-body">
+  <div class="info-card">
+    <h3>🔢 Setup Steps</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s8s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Get OpenAI API key</div><div class="step-detail">platform.openai.com → API Keys → Create new key → Copy it → Store it safely. Add $10–20 credit to start. GPT-4o costs about $0.01–0.05 per blog post — very cheap.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s8s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Write the master prompt for their business</div><div class="step-detail">Template: "You are a professional content writer for [Business Name], a [type of business] serving [city]. Write in a [friendly/professional/authoritative] tone. Always include: the business name, a call to action, and focus on [main service]. Never make up specific prices or guarantees."</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s8s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Build Make.com scenario for weekly blog posts</div><div class="step-detail">Trigger: Schedule → Every Monday 9am. Actions: 1) OpenAI → Chat completion → prompt: "Write a 600-word SEO blog post for [business] about {{topic}}. Include H2 headings and a CTA at the end." 2) Google Docs → Create new doc with the content. 3) Gmail → Email the doc link to client for review.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s8s4"><div class="step-num">4</div><div class="step-content"><div class="step-title">Build social media caption generator</div><div class="step-detail">Make.com scenario: Schedule → Daily 8am. OpenAI prompt: "Write 3 short social media captions for [business]. One for Facebook (conversational), one for Instagram (with hashtags), one for LinkedIn (professional). Topic: [rotating topic list]." → Save to Google Sheet with date column.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s8s5"><div class="step-num">5</div><div class="step-content"><div class="step-title">Deliver and train client</div><div class="step-detail">Share the Google Drive folder. Record a Loom showing: where to find the weekly blog doc, how to post it to their website (copy/paste into WordPress or website CMS), where to find social captions, how to copy and post to Facebook/Instagram.</div></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 9: EMAIL MARKETING ==================== -->
+<section class="guide-section" id="s9" data-search="email marketing mailchimp convertkit welcome sequence newsletter signup 500 1200">
+<div class="section-header">
+  <div class="section-icon">📧</div>
+  <div class="section-meta">
+    <span class="section-cat cat-addon">Standalone Add-On</span>
+    <h2>Email Marketing Setup</h2>
+    <div class="section-tagline">Set up Mailchimp, import contacts, build a welcome sequence, and connect it to the website. Clients love this.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s9-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s9-body">
+  <div class="info-card">
+    <h3>🔢 Setup Steps</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s9s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Create Mailchimp account (free for under 500 contacts)</div><div class="step-detail">mailchimp.com → Sign up → Create an Audience → Name it after their business. Set the From Name (business name) and From Email (their business email).</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s9s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Import existing customer contacts</div><div class="step-detail">Ask client for a list of past customers (Excel or CSV). Mailchimp → Audience → Add Contacts → Import CSV. Map columns: First Name, Last Name, Email. These are their most valuable people — they already paid once.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s9s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Build 3-email welcome sequence</div><div class="step-detail">Email 1 (Day 0): Welcome + who you are + what to expect. Email 2 (Day 2): Your best service + a customer success story. Email 3 (Day 5): Special offer or call to book. All written professionally in Mailchimp's email builder using a clean template.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s9s4"><div class="step-num">4</div><div class="step-content"><div class="step-title">Connect sign-up form to website</div><div class="step-detail">Mailchimp → Audience → Signup Forms → Embedded Forms → Copy HTML code → Add to website footer or contact page. Test by signing up with a personal email and verifying the welcome sequence fires.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s9s5"><div class="step-num">5</div><div class="step-content"><div class="step-title">Create monthly newsletter template</div><div class="step-detail">Build one reusable newsletter template in Mailchimp with: header (logo + tagline), section for a tip or update, section for a promotion, footer with address and unsubscribe. Client fills in the content each month — they just click Send.</div></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 10: CRM SETUP ==================== -->
+<section class="guide-section" id="s10" data-search="crm setup airtable hubspot google sheets pipeline 300 800">
+<div class="section-header">
+  <div class="section-icon">🗂️</div>
+  <div class="section-meta">
+    <span class="section-cat cat-addon">Standalone Add-On</span>
+    <h2>CRM Setup</h2>
+    <div class="section-tagline">Set up Airtable (recommended) or HubSpot to manage all client leads and jobs. Free tools, huge impact.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s10-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s10-body">
+  <div class="info-card">
+    <h3>🔢 Airtable CRM Setup (Recommended — Free)</h3>
+    <div class="steps-list">
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s10s1"><div class="step-num">1</div><div class="step-content"><div class="step-title">Create Airtable account and new Base</div><div class="step-detail">airtable.com → Sign up free → Create new Base → Name it "[Client Name] CRM". Delete the default fields and start fresh.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s10s2"><div class="step-num">2</div><div class="step-content"><div class="step-title">Set up fields</div><div class="step-detail">Add these fields: Name (Single line text), Business (Single line text), Email (Email), Phone (Phone), Service Needed (Single select: Website/Chatbot/Automation/Other), Status (Single select: New Lead/Contacted/Proposal Sent/Active/Complete/Maintaining), Value ($), Start Date (Date), Notes (Long text).</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s10s3"><div class="step-num">3</div><div class="step-content"><div class="step-title">Create Kanban view by Status</div><div class="step-detail">Views → Add view → Kanban → Group by Status field. Now they can drag-and-drop leads through the pipeline visually. This is the view clients use day-to-day.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s10s4"><div class="step-num">4</div><div class="step-content"><div class="step-title">Connect Airtable to Make.com for automatic lead entry</div><div class="step-detail">Make.com scenario → When website form is submitted → Airtable: Create record with Name, Email, Phone, Service from form data. Status auto-set to "New Lead". This means every website lead goes straight into the CRM without manual entry.</div></div></div>
+      <div class="step-item"><input type="checkbox" class="step-cb" id="s10s5"><div class="step-num">5</div><div class="step-content"><div class="step-title">Share with client and record training video</div><div class="step-detail">Airtable → Share base → Invite client email as Editor. Record a 5-minute Loom: "Here's your CRM. New leads appear here automatically. Click a card to see details. Drag to move through stages. Add notes after each call." That's it — they're trained.</div></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 11: BASIC CARE ==================== -->
+<section class="guide-section" id="s11" data-search="basic care retainer maintenance monthly 300 500 website update chatbot monitor report">
+<div class="section-header">
+  <div class="section-icon">🔵</div>
+  <div class="section-meta">
+    <span class="section-cat cat-retainer">Monthly Retainer</span>
+    <h2>Basic Care Retainer</h2>
+    <div class="section-tagline">$300–$500/month. Essential maintenance — keeps website live, chatbot tuned, client happy.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s11-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s11-body">
+  <div class="info-card">
+    <h3>📋 Monthly Checklist (Do These Every Month)</h3>
+    <div class="check-list">
+      <div class="check-item"><input type="checkbox" id="s11c1"><label for="s11c1">Verify website is live and loads correctly on mobile and desktop</label></div>
+      <div class="check-item"><input type="checkbox" id="s11c2"><label for="s11c2">Make up to 2 content updates client has requested (hours change, new service, photo swap)</label></div>
+      <div class="check-item"><input type="checkbox" id="s11c3"><label for="s11c3">Review Chatbase conversation logs — identify any unanswered or poor answers</label></div>
+      <div class="check-item"><input type="checkbox" id="s11c4"><label for="s11c4">Update chatbot knowledge base with any corrections found</label></div>
+      <div class="check-item"><input type="checkbox" id="s11c5"><label for="s11c5">Check Netlify form submissions — make sure notifications are still arriving</label></div>
+      <div class="check-item"><input type="checkbox" id="s11c6"><label for="s11c6">Check Google Analytics — note traffic vs. previous month (up or down?)</label></div>
+      <div class="check-item"><input type="checkbox" id="s11c7"><label for="s11c7">Send 1-page monthly report to client (use template in Section 16)</label></div>
+      <div class="check-item"><input type="checkbox" id="s11c8"><label for="s11c8">Send Wave invoice for next month's retainer</label></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 12: GROWTH CARE ==================== -->
+<section class="guide-section" id="s12" data-search="growth care retainer monthly 500 1000 automation optimization chatbot performance report">
+<div class="section-header">
+  <div class="section-icon">🟢</div>
+  <div class="section-meta">
+    <span class="section-cat cat-retainer">Monthly Retainer</span>
+    <h2>Growth Care Retainer</h2>
+    <div class="section-tagline">$500–$1,000/month. Active optimization + automation monitoring + 1 new automation per quarter.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s12-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s12-body">
+  <div class="info-card">
+    <h3>📋 Monthly Checklist</h3>
+    <div class="check-list">
+      <div class="check-item"><input type="checkbox" id="s12c1"><label for="s12c1">Everything in Basic Care checklist above</label></div>
+      <div class="check-item"><input type="checkbox" id="s12c2"><label for="s12c2">Up to 5 website content updates</label></div>
+      <div class="check-item"><input type="checkbox" id="s12c3"><label for="s12c3">Deeper chatbot optimization — review top 20 conversations, improve weak answers</label></div>
+      <div class="check-item"><input type="checkbox" id="s12c4"><label for="s12c4">Check all Make.com/n8n automation execution history — fix any failed runs</label></div>
+      <div class="check-item"><input type="checkbox" id="s12c5"><label for="s12c5">Review lead count: how many leads came in this month vs last month?</label></div>
+      <div class="check-item"><input type="checkbox" id="s12c6"><label for="s12c6">Send detailed monthly performance report with charts (leads, traffic, chatbot convos)</label></div>
+      <div class="check-item"><input type="checkbox" id="s12c7"><label for="s12c7">QUARTERLY: Build 1 new automation workflow (surprise and delight — adds perceived value)</label></div>
+      <div class="check-item"><input type="checkbox" id="s12c8"><label for="s12c8">Send Wave invoice for next month</label></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 13: PRO AI CARE ==================== -->
+<section class="guide-section" id="s13" data-search="pro ai care retainer 1000 2000 monthly unlimited updates strategy call new features analytics">
+<div class="section-header">
+  <div class="section-icon">🟡</div>
+  <div class="section-meta">
+    <span class="section-cat cat-retainer">Monthly Retainer</span>
+    <h2>Pro AI Care Retainer</h2>
+    <div class="section-tagline">$1,000–$2,000/month. Full-service AI management — their dedicated AI team on call every month.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s13-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s13-body">
+  <div class="info-card">
+    <h3>📋 Monthly Checklist</h3>
+    <div class="check-list">
+      <div class="check-item"><input type="checkbox" id="s13c1"><label for="s13c1">Everything in Growth Care checklist above</label></div>
+      <div class="check-item"><input type="checkbox" id="s13c2"><label for="s13c2">Unlimited website updates (respond within 24 hours)</label></div>
+      <div class="check-item"><input type="checkbox" id="s13c3"><label for="s13c3">Full automation suite review — test every workflow end-to-end</label></div>
+      <div class="check-item"><input type="checkbox" id="s13c4"><label for="s13c4">Add 1 new AI feature or improvement per month</label></div>
+      <div class="check-item"><input type="checkbox" id="s13c5"><label for="s13c5">Proactive suggestions: "I noticed your chatbot gets asked about X a lot — want me to add a booking flow for that?"</label></div>
+      <div class="check-item"><input type="checkbox" id="s13c6"><label for="s13c6">QUARTERLY: 30-minute strategy call via Google Meet to review goals and plan next quarter</label></div>
+      <div class="check-item"><input type="checkbox" id="s13c7"><label for="s13c7">Detailed analytics report with: traffic, leads, chatbot performance, automation runs, ROI estimate</label></div>
+      <div class="check-item"><input type="checkbox" id="s13c8"><label for="s13c8">Send Wave invoice for next month</label></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 14: ONBOARDING EMAIL ==================== -->
+<section class="guide-section" id="s14" data-search="onboarding email template deposit paid welcome next steps timeline intake">
+<div class="section-header">
+  <div class="section-icon">📨</div>
+  <div class="section-meta">
+    <span class="section-cat cat-template">Template</span>
+    <h2>Client Onboarding Email</h2>
+    <div class="section-tagline">Send this within 1 hour of receiving the deposit. Sets professional expectations and kicks off the project.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s14-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s14-body">
+  <div class="info-card">
+    <h3>📧 Email Template — Copy and Customize</h3>
+    <div style="position:relative;">
+      <pre class="template-box" id="onboarding-tpl">Subject: Welcome to SmithDev Labs — Let's Build Something Great! 🚀
+
+Hi [Client First Name],
+
+Thank you for choosing SmithDev Labs! Your deposit has been received and we are officially kicking off your project.
+
+Here is what happens next:
+
+STEP 1 — Complete Your Intake Form (takes 5–10 min)
+Please fill out this short form so I can collect everything I need to get started:
+[Link to Google Form or Typeform intake questionnaire]
+
+STEP 2 — I Get to Work
+Once I receive your intake form, I'll begin building immediately. You'll hear from me within 24 hours with a progress update.
+
+STEP 3 — Review & Launch
+I'll send you a preview link before going live. You'll have one round of revisions to request changes before final delivery.
+
+YOUR TIMELINE:
+Project Start: [Today's Date]
+Estimated Delivery: [Date + business days]
+Final Payment Due: On delivery and approval
+
+QUESTIONS?
+Reply to this email or text/call me directly:
+📞 [Your phone number]
+📧 msmith@smithdevlabs.com
+
+I'm excited to build something great for [Business Name]. Talk soon!
+
+— Michael Smith
+SmithDev Labs LLC
+smithdevlabs.com</pre>
+      <button class="copy-btn" onclick="copyTemplate('onboarding-tpl')">📋 Copy</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 15: DELIVERY EMAIL ==================== -->
+<section class="guide-section" id="s15" data-search="delivery email template project complete final payment loom video handoff retainer">
+<div class="section-header">
+  <div class="section-icon">🎉</div>
+  <div class="section-meta">
+    <span class="section-cat cat-template">Template</span>
+    <h2>Project Delivery Email</h2>
+    <div class="section-tagline">Send when the project is live and ready. Include the Loom walkthrough link and final invoice.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s15-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s15-body">
+  <div class="info-card">
+    <h3>📧 Email Template — Copy and Customize</h3>
+    <div style="position:relative;">
+      <pre class="template-box" id="delivery-tpl">Subject: Your Project is LIVE! 🎉 Here's Everything You Need
+
+Hi [Client First Name],
+
+Great news — [Business Name]'s [website/chatbot/system] is officially live!
+
+WHAT WAS BUILT:
+✓ [Deliverable 1 — e.g. 7-page professional website at domain.com]
+✓ [Deliverable 2 — e.g. AI chatbot trained on your FAQs and services]
+✓ [Deliverable 3 — e.g. Lead-to-CRM automation via Make.com]
+✓ [Deliverable 4 — e.g. Review request automation]
+
+YOUR LIVE LINKS:
+🌐 Website: [https://yourdomain.com]
+🤖 Chatbot: Live on all pages
+📊 Airtable CRM: [link to their Airtable base]
+
+WATCH YOUR WALKTHROUGH VIDEO:
+I've recorded a full walkthrough so you know how everything works:
+🎬 [Loom video link — 5–10 min]
+
+FINAL PAYMENT:
+The final 50% balance of $[amount] is now due. Invoice sent separately via Wave.
+
+NEXT STEPS — KEEP GROWING:
+Your new system is powerful, but it performs best with ongoing optimization. 
+I offer monthly care plans starting at $300/month that include updates, 
+chatbot retraining, and automation monitoring. Reply to ask about this!
+
+I'd love a quick Google review if you're happy with the work:
+⭐ [Your Google Review Link]
+
+Thank you for trusting SmithDev Labs with your business. 
+I'm here if you ever need anything!
+
+— Michael Smith
+SmithDev Labs LLC
+📞 [Your phone] | msmith@smithdevlabs.com</pre>
+      <button class="copy-btn" onclick="copyTemplate('delivery-tpl')">📋 Copy</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 16: MONTHLY REPORT ==================== -->
+<section class="guide-section" id="s16" data-search="monthly report template retainer analytics traffic leads chatbot automations">
+<div class="section-header">
+  <div class="section-icon">📊</div>
+  <div class="section-meta">
+    <span class="section-cat cat-template">Template</span>
+    <h2>Monthly Report Template</h2>
+    <div class="section-tagline">Send this every month to retainer clients. Shows them value and keeps them from canceling.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s16-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s16-body">
+  <div class="info-card">
+    <h3>📧 Monthly Report Email — Copy and Customize</h3>
+    <div style="position:relative;">
+      <pre class="template-box" id="report-tpl">Subject: Your SmithDev Labs Monthly Report — [Month] [Year]
+
+Hi [Client First Name],
+
+Here's your monthly performance snapshot for [Business Name]. 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+📈 WEBSITE TRAFFIC
+━━━━━━━━━━━━━━━━━━━━━━━━━
+Visitors this month:     [X] (vs [Y] last month — [+/-Z%])
+Top traffic source:      [Google / Direct / Social]
+Most visited page:       [Page name]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+💬 AI CHATBOT
+━━━━━━━━━━━━━━━━━━━━━━━━━
+Total conversations:     [X]
+Leads captured:          [X]
+Most asked question:     "[Question]"
+Improvements made:       [Brief description]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+⚙️ AUTOMATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━
+Review requests sent:    [X]
+Appointment reminders:   [X]
+Email sequences fired:   [X]
+Issues fixed:            [None / Brief description]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ WORK COMPLETED THIS MONTH
+━━━━━━━━━━━━━━━━━━━━━━━━━
+• [Update 1]
+• [Update 2]
+• [Update 3]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+🗓️ PLANNED FOR NEXT MONTH
+━━━━━━━━━━━━━━━━━━━━━━━━━
+• [Planned item 1]
+• [Planned item 2]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+Questions? Just reply to this email!
+
+— Michael Smith
+SmithDev Labs LLC | msmith@smithdevlabs.com</pre>
+      <button class="copy-btn" onclick="copyTemplate('report-tpl')">📋 Copy</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 17: SCOPE CREEP ==================== -->
+<section class="guide-section" id="s17" data-search="scope creep out of scope extra work change request response script professional">
+<div class="section-header">
+  <div class="section-icon">🛑</div>
+  <div class="section-meta">
+    <span class="section-cat cat-template">Template</span>
+    <h2>Scope Creep Response Script</h2>
+    <div class="section-tagline">When a client asks for work that was not in the original agreement. Be professional, firm, and offer a path forward.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s17-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s17-body">
+  <div class="info-card">
+    <h3>💬 Response Script — Copy and Use</h3>
+    <div style="position:relative;">
+      <pre class="template-box" id="scope-tpl">Hi [Name],
+
+Great idea — I love that you're thinking about [their request]!
+
+That said, [the requested item] falls outside the scope of what we agreed on 
+for this project. The original agreement covered [brief recap of what was included].
+
+I have two options for you:
+
+OPTION 1 — ADD IT NOW
+I can add [requested work] to your current project for an additional [price range].
+This would extend your delivery date by approximately [X days].
+
+OPTION 2 — SAVE IT FOR RETAINER
+If you're interested in a monthly care plan, I can include [requested work] 
+as part of your first month's work. Monthly plans start at $300/month.
+
+OPTION 3 — QUEUE IT AS A SEPARATE PROJECT
+I can quote this as a standalone add-on project once your current 
+project is delivered. Usually 1–3 days and $[price range].
+
+Just let me know which direction works best for you and we'll get it sorted!
+
+— Michael</pre>
+      <button class="copy-btn" onclick="copyTemplate('scope-tpl')">📋 Copy</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== SECTION 18: COLD CALL SCRIPT ==================== -->
+<section class="guide-section" id="s18" data-search="cold call script demo close sales prospect client phone call google meet presentation">
+<div class="section-header">
+  <div class="section-icon">📞</div>
+  <div class="section-meta">
+    <span class="section-cat cat-template">Template</span>
+    <h2>Cold Call → Demo → Close Script</h2>
+    <div class="section-tagline">The full playbook: cold call opener, how to pitch the demo, and how to close on the call. Print this and keep it on your desk.</div>
+  </div>
+  <button class="section-toggle" onclick="toggleSection('s18-body')">Collapse ▲</button>
+</div>
+<div class="section-body" id="s18-body">
+  <div class="info-card">
+    <h3>📞 PART 1 — The Cold Call Opener</h3>
+    <div style="position:relative;">
+      <pre class="template-box" id="coldcall-tpl">YOU: "Hi, is this [Owner Name]?"
+
+THEM: "Yes, who's this?"
+
+YOU: "Hey [Name], this is Michael with SmithDev Labs. I'll be quick — I was 
+looking at [Business Name] online and I had a quick idea that I think could 
+get you more [leads / bookings / customers] without any extra ad spend. 
+Do you have 60 seconds?"
+
+IF YES:
+YOU: "We build AI chatbots for [their industry] that answer customer questions 
+and capture leads 24/7 — even when you're on a job. Most of our clients see 
+[2–3x more leads] within the first 30 days. I'd love to show you a live demo 
+built specifically for your type of business. Could we jump on a quick 
+10-minute Google Meet this week — say [day] or [day]?"
+
+IF THEY SAY "I already have a website":
+YOU: "Perfect — we actually work with existing websites too. We just add the 
+AI chatbot on top of what you already have. Takes less than 24 hours and you 
+keep everything you've got. Would you be open to a quick demo?"
+
+IF THEY SAY "I'm not interested":
+YOU: "Totally fair. Would it be okay if I sent you a quick example of what 
+this looks like for a [plumber/dentist/restaurant] just like yours? No 
+pressure at all — just so you have it if things ever change."
+
+IF THEY SAY "Send me an email":
+YOU: "Absolutely. What's the best email? And I'll send it with a short 
+Loom video so you can see it in action — takes 2 minutes to watch."
+━━━━━━━━━━━━━━━━━━━━━━━━━
+</pre>
+      <button class="copy-btn" onclick="copyTemplate('coldcall-tpl')">📋 Copy Part 1</button>
+    </div>
+  </div>
+  <div class="info-card">
+    <h3>💻 PART 2 — The Live Google Meet Demo</h3>
+    <div style="position:relative;">
+      <pre class="template-box" id="demo-tpl">SETUP BEFORE THE CALL:
+• Have Durable.co open — ready to build a demo site in 30 seconds
+• Have Chatbase open with a GENERIC demo chatbot built for their industry
+• Have your portfolio page open (smithdevlabs.com/portfolio.html)
+• Have your pricing page ready to share
+• Have Calendly link ready to send deposit invoice immediately after
+
+DURING THE DEMO (10–15 minutes):
+
+[0:00 – 2:00] SMALL TALK + SET AGENDA
+"Thanks for jumping on. I'm going to show you 3 things today — 
+takes about 10 minutes. Sound good?"
+
+[2:00 – 5:00] SHOW THE CHATBOT DEMO
+Open your demo chatbot. "This is what one of our chatbots looks like — 
+it's trained on a [plumber] just like you. Watch this..." 
+Type: "Do you do emergency repairs?" → show the answer.
+Type: "Can I book an appointment?" → show the flow.
+"This is running on your website 24/7 — while you're asleep, on a job, 
+or with your family. It captures their name, email, and phone automatically."
+
+[5:00 – 8:00] SHOW THE AUTOMATION
+"When that chatbot captures a lead, here's what happens automatically..."
+Draw it out on screen or show a flowchart:
+Lead captured → You get a text in 60 seconds → Lead goes in your CRM → 
+3-email follow-up fires → After the job, review request goes out automatically.
+"Zero manual work. You just show up and do the job."
+
+[8:00 – 10:00] SHOW THE WEBSITE (if applicable)
+Open Durable.co → Generate a site for their business in 30 seconds.
+"This is what a basic version looks like — we build a much more custom 
+version, but this gives you the idea. Your real site would have your photos, 
+your services, your brand."
+
+[10:00 – 12:00] CLOSE
+"So based on what I showed you — does this make sense for [Business Name]?"
+[Wait for response]
+
+"The package that fits your situation best is [Growth / Starter / Pro].
+It's $[price], 50% deposit today to get started, and you're live in [X days].
+I can send the deposit link right now while we're on the call — 
+it takes about 2 minutes. Want to do that?"
+
+IF THEY SAY YES:
+Send Calendly / Wave invoice link in the chat immediately.
+"Perfect — I'm sending that right now. Once that's through, 
+I'll send your onboarding email within the hour and we get started."
+
+IF THEY SAY "I need to think about it":
+"Totally. What's the main thing you're unsure about?" 
+[Address their concern]
+"What if I send you a follow-up email with everything we talked about 
+plus some examples — and we touch base [day + 2]? Does that work?"</pre>
+      <button class="copy-btn" onclick="copyTemplate('demo-tpl')">📋 Copy Part 2</button>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+</div>
+
+<script>
+function toggleSection(bodyId) {
+  const body = document.getElementById(bodyId);
+  const btn = body.previousElementSibling.querySelector('.section-toggle');
+  if (body.style.display === 'none') {
+    body.style.display = 'flex';
+    btn.textContent = 'Collapse ▲';
+  } else {
+    body.style.display = 'none';
+    btn.textContent = 'Expand ▼';
+  }
+}
+
+function filterSections(query) {
+  const q = query.toLowerCase().trim();
+  const sections = document.querySelectorAll('.guide-section');
+  const noResults = document.getElementById('noResults');
+  let visible = 0;
+  sections.forEach(s => {
+    const text = (s.dataset.search + ' ' + s.textContent).toLowerCase();
+    if (!q || text.includes(q)) {
+      s.classList.remove('hidden');
+      visible++;
+    } else {
+      s.classList.add('hidden');
+    }
+  });
+  noResults.style.display = visible === 0 ? 'block' : 'none';
+}
+
+function copyTemplate(id) {
+  const el = document.getElementById(id);
+  const text = el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.parentElement.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    btn.style.color = '#22c55e';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+  });
+}
+
+// Save checkbox states to localStorage
+document.querySelectorAll('input[type=checkbox]').forEach(cb => {
+  const key = 'sdl-guide-' + cb.id;
+  cb.checked = localStorage.getItem(key) === 'true';
+  cb.addEventListener('change', () => localStorage.setItem(key, cb.checked));
+});
+
+// Sidebar active link on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+      const link = document.querySelector('.sidebar-link[href="#' + e.target.id + '"]');
+      if (link) link.classList.add('active');
+    }
+  });
+}, { threshold: 0.2 });
+document.querySelectorAll('.guide-section').forEach(s => observer.observe(s));
+</script>
+
+<div style="text-align:center;margin-top:32px;padding:16px;color:#64748b;font-size:.75rem;line-height:2;border-top:1px solid #e2e8f0;">
+  SmithDev Labs LLC &nbsp;·&nbsp; msmith@smithdevlabs.com &nbsp;·&nbsp; smithdevlabs.com
+  <br>
+  <span style="color:#2563eb;font-weight:600;">Business Hours: Mon–Fri &nbsp;9:00 AM – 5:00 PM EST</span>
+  &nbsp;·&nbsp; After hours? Email, text, or book an appointment via chatbot — we'll get back to you ASAP.
+</div>
+
+</body>
+</html>

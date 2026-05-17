@@ -213,6 +213,7 @@
     <div class="page-header">
       <div class="page-title">Clients <span id="viewLabel">— All</span></div>
       <div class="header-actions">
+        <div id="drive-status" style="display:flex;align-items:center;"></div>
         <button class="btn btn-ghost" onclick="exportCSV()">⬇️ Export CSV</button>
         <button class="btn btn-ghost" onclick="openImportModal()" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;" title="Paste JSON from chatbot lead">📥 Import Lead</button>
         <button class="btn btn-primary" onclick="openModal()">+ Add Client</button>
@@ -388,7 +389,7 @@
   let currentFilter = 'all';
   let currentView = 'list';
 
-  function save() { localStorage.setItem('sdl-clients', JSON.stringify(clients)); updateStats(); }
+  function save() { localStorage.setItem('sdl-clients', JSON.stringify(clients)); updateStats(); driveBackup(); }
 
   function initials(name) { return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '??'; }
   function colorFor(name) { let h=0; for(let c of name) h+=c.charCodeAt(0); return COLORS[h % COLORS.length]; }
@@ -771,6 +772,125 @@
   updateStats();
   updateBookingsBadge();
   autoImportPendingBookings();
+
+  // --- GOOGLE DRIVE BACKUP (File System Access API) ---
+  let driveFileHandle = null;
+
+  async function openDriveIDB() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('sdl-drive-backup', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('handles');
+      req.onsuccess = e => res(e.target.result);
+      req.onerror   = () => rej();
+    });
+  }
+
+  async function loadDriveHandle() {
+    try {
+      const db = await openDriveIDB();
+      return new Promise(res => {
+        const req = db.transaction('handles','readonly').objectStore('handles').get('backup');
+        req.onsuccess = e => res(e.target.result || null);
+        req.onerror   = () => res(null);
+      });
+    } catch { return null; }
+  }
+
+  async function storeDriveHandle(handle) {
+    try {
+      const db = await openDriveIDB();
+      return new Promise(res => {
+        const tx = db.transaction('handles','readwrite');
+        tx.objectStore('handles').put(handle, 'backup');
+        tx.oncomplete = () => res();
+        tx.onerror    = () => res();
+      });
+    } catch {}
+  }
+
+  function setDriveStatus(state) {
+    const el = document.getElementById('drive-status');
+    if (!el) return;
+    if (state === 'ok') {
+      const t = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+      el.innerHTML = `<span style="font-size:.78rem;color:#16a34a;font-weight:700;">✅ Drive backup ${t}</span>&nbsp;<button onclick="disconnectDriveBackup()" style="font-size:.7rem;color:#94a3b8;background:none;border:none;cursor:pointer;" title="Disconnect backup">✕</button>`;
+    } else if (state === 'resume') {
+      el.innerHTML = `<button onclick="resumeDriveBackup()" style="background:#f59e0b;color:white;border:none;border-radius:7px;padding:5px 12px;font-size:.78rem;font-weight:700;cursor:pointer;" title="Re-authorize Drive backup for this session">▶ Resume Drive Backup</button>`;
+    } else if (state === 'connected') {
+      el.innerHTML = `<span style="font-size:.78rem;color:#3b82f6;font-weight:700;">🔗 Drive connected</span>`;
+    } else if (state === 'error') {
+      el.innerHTML = `<span style="font-size:.78rem;color:#ef4444;">⚠️ Backup failed &nbsp;</span><button onclick="connectDriveBackup()" style="font-size:.72rem;color:#3b82f6;background:none;border:none;cursor:pointer;">Reconnect</button>`;
+    } else {
+      el.innerHTML = `<button onclick="connectDriveBackup()" style="background:#3b82f6;color:white;border:none;border-radius:7px;padding:5px 12px;font-size:.78rem;font-weight:700;cursor:pointer;" title="Pick a file inside your Google Drive folder — auto-saves on every change">📂 Connect Drive Backup</button>`;
+    }
+  }
+
+  async function driveBackup() {
+    if (!driveFileHandle) return;
+    try {
+      const perm = await driveFileHandle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') { setDriveStatus('resume'); return; }
+      const payload = { exported: new Date().toISOString(), count: clients.length, clients };
+      const writable = await driveFileHandle.createWritable();
+      await writable.write(JSON.stringify(payload, null, 2));
+      await writable.close();
+      setDriveStatus('ok');
+    } catch { setDriveStatus('error'); }
+  }
+
+  async function connectDriveBackup() {
+    if (!('showSaveFilePicker' in window)) {
+      alert('Drive backup requires Chrome or Edge. Your current browser does not support this feature.');
+      return;
+    }
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'SmithDevLabs_CRM_Backup.json',
+        types: [{ description: 'JSON Backup', accept: { 'application/json': ['.json'] } }]
+      });
+      driveFileHandle = handle;
+      await storeDriveHandle(handle);
+      setDriveStatus('connected');
+      driveBackup();
+    } catch(e) {
+      if (e.name !== 'AbortError') alert('Could not connect to Drive file: ' + e.message);
+    }
+  }
+
+  async function resumeDriveBackup() {
+    if (!driveFileHandle) return;
+    try {
+      const perm = await driveFileHandle.requestPermission({ mode: 'readwrite' });
+      if (perm === 'granted') driveBackup();
+    } catch {}
+  }
+
+  async function disconnectDriveBackup() {
+    driveFileHandle = null;
+    try {
+      const db = await openDriveIDB();
+      const tx = db.transaction('handles','readwrite');
+      tx.objectStore('handles').delete('backup');
+    } catch {}
+    setDriveStatus('none');
+  }
+
+  async function initDriveBackup() {
+    if (!('showSaveFilePicker' in window)) {
+      setDriveStatus('none');
+      return;
+    }
+    const handle = await loadDriveHandle();
+    if (!handle) { setDriveStatus('none'); return; }
+    driveFileHandle = handle;
+    try {
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm === 'granted') { setDriveStatus('connected'); driveBackup(); }
+      else { setDriveStatus('resume'); }
+    } catch { setDriveStatus('none'); }
+  }
+
+  initDriveBackup();
 </script>
 
 <div style="text-align:center;margin-top:32px;padding:16px;color:#64748b;font-size:.75rem;line-height:2;border-top:1px solid #e2e8f0;">

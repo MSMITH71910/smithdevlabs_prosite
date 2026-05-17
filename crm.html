@@ -4,6 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmithDev Labs — Client CRM</title>
+  <script>
+    (function () {
+      const HASH = '7ea395a101e297f8a8fb42a77c738e1fe0d234005e082d74ef7eadb481edbbc1';
+      if (sessionStorage.getItem('sdl-crm-auth') === HASH) return;
+      document.addEventListener('DOMContentLoaded', function () {
+        const overlay = document.createElement('div');
+        overlay.id = 'crm-gate';
+        overlay.style.cssText = 'position:fixed;inset:0;background:#0f1117;z-index:99999;display:flex;align-items:center;justify-content:center;';
+        overlay.innerHTML = `
+          <div style="background:#1a1d27;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:40px 36px;width:100%;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.5);">
+            <div style="font-size:2.2rem;margin-bottom:10px;">🔐</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#f1f5f9;margin-bottom:4px;">SmithDev Labs CRM</div>
+            <div style="font-size:0.78rem;color:#64748b;margin-bottom:24px;">Owner access only</div>
+            <input id="crm-pw-input" type="password" placeholder="Enter password"
+              style="width:100%;background:#22263a;border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 16px;color:#f1f5f9;font-size:0.95rem;outline:none;margin-bottom:10px;box-sizing:border-box;"
+              onkeydown="if(event.key==='Enter')document.getElementById('crm-pw-btn').click()" />
+            <div id="crm-pw-err" style="color:#ef4444;font-size:0.78rem;margin-bottom:8px;display:none;">Incorrect password — try again.</div>
+            <button id="crm-pw-btn" type="button"
+              style="width:100%;background:#3b82f6;color:white;border:none;border-radius:10px;padding:12px;font-size:0.95rem;font-weight:700;cursor:pointer;">
+              Unlock CRM
+            </button>
+          </div>`;
+        document.body.appendChild(overlay);
+        document.getElementById('crm-pw-input').focus();
+        document.getElementById('crm-pw-btn').addEventListener('click', async function () {
+          const val = document.getElementById('crm-pw-input').value;
+          const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(val));
+          const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+          if (hex === HASH) {
+            sessionStorage.setItem('sdl-crm-auth', HASH);
+            overlay.remove();
+          } else {
+            document.getElementById('crm-pw-err').style.display = 'block';
+            document.getElementById('crm-pw-input').value = '';
+            document.getElementById('crm-pw-input').focus();
+          }
+        });
+      });
+    })();
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {

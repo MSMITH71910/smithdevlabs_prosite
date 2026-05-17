@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmithDev Labs — Client CRM</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a;
+      --border: rgba(255,255,255,.08); --border2: rgba(255,255,255,.14);
+      --primary: #3b82f6; --text: #f1f5f9; --text-muted: #94a3b8;
+      --green: #22c55e; --yellow: #f59e0b; --purple: #a855f7;
+      --cyan: #06b6d4; --orange: #f97316; --red: #ef4444;
+      --radius: 12px;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+
+    /* LAYOUT */
+    .app { display: flex; height: 100vh; overflow: hidden; }
+    .sidebar { width: 240px; background: var(--surface); border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+    .main { flex: 1; overflow-y: auto; padding: 28px 32px; }
+
+    /* SIDEBAR */
+    .brand { font-size: 1rem; font-weight: 800; background: linear-gradient(135deg,#3b82f6,#a855f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom: 20px; padding: 0 8px; }
+    .brand span { display:block; font-size:.7rem; -webkit-text-fill-color: var(--text-muted); color: var(--text-muted); font-weight:400; margin-top:2px; }
+    .nav-btn { background: none; border: none; color: var(--text-muted); font-size: .85rem; font-weight: 600; padding: 9px 12px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; width: 100%; transition: all .15s; }
+    .nav-btn:hover, .nav-btn.active { background: rgba(59,130,246,.12); color: #60a5fa; }
+    .nav-section { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); padding: 16px 12px 6px; }
+    .sidebar-stats { margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-radius: 8px; }
+    .stat-label { font-size: .75rem; color: var(--text-muted); }
+    .stat-val { font-size: .85rem; font-weight: 800; }
+
+    /* HEADER */
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .page-title { font-size: 1.4rem; font-weight: 800; }
+    .page-title span { color: var(--text-muted); font-weight: 400; font-size: 1rem; margin-left: 8px; }
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* BUTTONS */
+    .btn { padding: 9px 18px; border-radius: 8px; font-size: .82rem; font-weight: 700; cursor: pointer; border: none; transition: all .18s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-ghost { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border2); }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,.25); }
+    .btn-sm { padding: 6px 12px; font-size: .75rem; }
+    .btn-danger { background: rgba(239,68,68,.15); color: #f87171; border: 1px solid rgba(239,68,68,.3); }
+    .btn-danger:hover { background: rgba(239,68,68,.25); }
+
+    /* FILTERS */
+    .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-btn { padding: 6px 14px; border-radius: 999px; font-size: .78rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: var(--surface); color: var(--text-muted); transition: all .15s; }
+    .filter-btn:hover, .filter-btn.active { color: white; border-color: transparent; }
+    .filter-btn.f-all.active    { background: var(--primary); }
+    .filter-btn.f-prospect.active { background: var(--purple); }
+    .filter-btn.f-active.active  { background: var(--green); }
+    .filter-btn.f-completed.active { background: var(--cyan); }
+    .filter-btn.f-maintaining.active { background: var(--orange); }
+
+    /* SEARCH */
+    .search-bar { position: relative; margin-bottom: 20px; }
+    .search-bar input { width: 100%; background: var(--surface); border: 1px solid var(--border2); border-radius: 10px; padding: 10px 16px 10px 40px; color: var(--text); font-size: .875rem; outline: none; transition: border-color .2s; }
+    .search-bar input:focus { border-color: var(--primary); }
+    .search-bar::before { content: '🔍'; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: .85rem; }
+
+    /* CLIENT CARDS */
+    .clients-grid { display: flex; flex-direction: column; gap: 12px; }
+    .client-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; transition: border-color .2s; cursor: pointer; }
+    .client-card:hover { border-color: var(--border2); }
+    .client-card.expanded { border-color: var(--primary); }
+
+    .client-avatar { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; color: white; flex-shrink: 0; }
+    .client-info .client-name { font-weight: 700; font-size: .95rem; }
+    .client-info .client-meta { font-size: .78rem; color: var(--text-muted); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .client-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .badge { padding: 3px 10px; border-radius: 999px; font-size: .7rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+    .badge-prospect  { background: rgba(168,85,247,.15); color: #c084fc; }
+    .badge-active    { background: rgba(34,197,94,.15);  color: #4ade80; }
+    .badge-completed { background: rgba(6,182,212,.15);  color: #22d3ee; }
+    .badge-maintaining { background: rgba(249,115,22,.15); color: #fb923c; }
+
+    .card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* EXPANDED DETAIL */
+    .client-detail { display: none; border-top: 1px solid var(--border); margin-top: 16px; padding-top: 16px; }
+    .client-card.expanded .client-detail { display: block; }
+    .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .detail-field label { font-size: .68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px; }
+    .detail-field p { font-size: .85rem; color: var(--text); }
+    .notes-block label { font-size: .68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 6px; }
+    .notes-block textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: .82rem; resize: vertical; outline: none; font-family: inherit; min-height: 70px; }
+    .notes-block textarea:focus { border-color: var(--primary); }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+    .modal-overlay.hidden { display: none; }
+    .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+    .modal h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; }
+    .form-group input, .form-group select, .form-group textarea {
+      background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px;
+      padding: 9px 12px; color: var(--text); font-size: .875rem; outline: none;
+      transition: border-color .2s; font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+    .form-group select option { background: var(--surface2); }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 60px 24px; color: var(--text-muted); }
+    .empty-state div { font-size: 3rem; margin-bottom: 12px; }
+
+    /* KANBAN VIEW */
+    .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .kanban-col { background: var(--surface); border-radius: var(--radius); padding: 14px; }
+    .kanban-header { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .kanban-count { background: var(--surface2); padding: 2px 8px; border-radius: 999px; font-size: .7rem; }
+    .kanban-item { background: var(--surface2); border-radius: 8px; padding: 12px; margin-bottom: 8px; font-size: .82rem; border-left: 3px solid transparent; cursor: pointer; transition: transform .15s; }
+    .kanban-item:hover { transform: translateY(-2px); }
+    .kanban-item .k-name { font-weight: 700; margin-bottom: 4px; }
+    .kanban-item .k-service { color: var(--text-muted); font-size: .73rem; }
+
+    .hidden { display: none !important; }
+
+    /* CALENDAR VIEW */
+    .cal-wrap { display: flex; flex-direction: column; gap: 16px; height: calc(100vh - 120px); }
+    .cal-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .cal-info { background: var(--surface); border: 1px solid var(--border2); border-radius: 10px; padding: 12px 18px; font-size: .82rem; color: var(--text-muted); display: flex; align-items: center; gap: 10px; }
+    .cal-info strong { color: var(--text); }
+    .cal-iframe-wrap { flex: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border2); background: white; }
+    .cal-iframe-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    @media (max-width: 900px) { .detail-grid { grid-template-columns: 1fr 1fr; } .kanban { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) { .sidebar { display: none; } .main { padding: 16px; } .form-grid { grid-template-columns: 1fr; } .kanban { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">SmithDev Labs<span>Client CRM</span></div>
+
+    <div class="nav-section">Views</div>
+    <button class="nav-btn active" onclick="setView('list',this)">📋 All Clients</button>
+    <button class="nav-btn" onclick="setView('kanban',this)">🗂️ Pipeline Board</button>
+    <button class="nav-btn" onclick="setView('calendar',this)">📅 Google Calendar</button>
+    <button class="nav-btn" onclick="setView('bookings',this)" id="bookingsNavBtn">📬 Pending Bookings <span id="bookingsBadge" style="background:#ef4444;color:white;border-radius:50px;padding:1px 6px;font-size:0.7rem;margin-left:4px;display:none;">0</span></button>
+
+    <div class="nav-section">Filter by Status</div>
+    <button class="nav-btn" onclick="setSideFilter('all',this)">🔵 All</button>
+    <button class="nav-btn" onclick="setSideFilter('prospect',this)">🟣 Prospects</button>
+    <button class="nav-btn" onclick="setSideFilter('active',this)">🟢 Active Projects</button>
+    <button class="nav-btn" onclick="setSideFilter('completed',this)">🔵 Completed</button>
+    <button class="nav-btn" onclick="setSideFilter('maintaining',this)">🟠 Maintaining</button>
+
+    <div class="sidebar-stats">
+      <div class="nav-section" style="padding-top:0;">Stats</div>
+      <div class="stat-row"><span class="stat-label">Total Clients</span><span class="stat-val" id="s-total">0</span></div>
+      <div class="stat-row"><span class="stat-label">Active</span><span class="stat-val" style="color:var(--green)" id="s-active">0</span></div>
+      <div class="stat-row"><span class="stat-label">Prospects</span><span class="stat-val" style="color:var(--purple)" id="s-prospect">0</span></div>
+      <div class="stat-row"><span class="stat-label">Maintaining</span><span class="stat-val" style="color:var(--orange)" id="s-maintaining">0</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Clients <span id="viewLabel">— All</span></div>
+      <div class="header-actions">
+        <button class="btn btn-ghost" onclick="exportCSV()">⬇️ Export CSV</button>
+        <button class="btn btn-ghost" onclick="openImportModal()" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;" title="Paste JSON from chatbot lead">📥 Import Lead</button>
+        <button class="btn btn-primary" onclick="openModal()">+ Add Client</button>
+      </div>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div id="listView">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search by name, business, or service…" oninput="renderClients()" />
+      </div>
+      <div class="filters">
+        <button class="filter-btn f-all active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn f-prospect" onclick="setFilter('prospect',this)">🟣 Prospects</button>
+        <button class="filter-btn f-active" onclick="setFilter('active',this)">🟢 Active</button>
+        <button class="filter-btn f-completed" onclick="setFilter('completed',this)">🔵 Completed</button>
+        <button class="filter-btn f-maintaining" onclick="setFilter('maintaining',this)">🟠 Maintaining</button>
+      </div>
+      <div class="clients-grid" id="clientsGrid"></div>
+    </div>
+
+    <!-- CALENDAR VIEW -->
+    <div id="calendarView" class="hidden">
+      <div class="cal-wrap">
+        <div class="cal-toolbar">
+          <div class="cal-info">
+            <span>📧</span>
+            <span>Showing calendar for <strong>msmith@smithdevlabs.com</strong> — make sure you are signed into Google in this browser</span>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="scheduleEvent()">+ New Event</button>
+            <a href="https://calendar.google.com/calendar/r" target="_blank" class="btn btn-primary btn-sm">↗ Open in Google</a>
+          </div>
+        </div>
+        <div class="cal-iframe-wrap">
+          <iframe
+            src="https://calendar.google.com/calendar/embed?src=msmith%40smithdevlabs.com&ctz=America%2FNew_York"
+            style="border:0"
+            width="100%"
+            height="100%"
+            frameborder="0"
+            scrolling="no">
+          </iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- PENDING BOOKINGS VIEW -->
+    <div id="bookingsView" class="hidden">
+      <div style="padding:24px 0 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:1.15rem;font-weight:800;color:#1e293b;">📬 Pending Booking Requests</div>
+          <div style="font-size:0.82rem;color:#64748b;margin-top:2px;">Clients who scheduled a call via your website. Confirm each one and add to your calendar.</div>
+        </div>
+        <button class="btn btn-ghost" onclick="clearConfirmedBookings()" style="font-size:0.8rem;">🗑️ Clear Confirmed</button>
+      </div>
+      <div id="bookingsGrid" style="display:flex;flex-direction:column;gap:12px;margin-top:8px;"></div>
+      <div id="bookingsEmpty" style="text-align:center;padding:60px 16px;color:#94a3b8;font-size:0.9rem;display:none;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">📭</div>
+        <strong>No pending bookings yet</strong><br>
+        When clients schedule a call on your website, they'll appear here automatically.
+      </div>
+    </div>
+
+    <!-- KANBAN VIEW -->
+    <div id="kanbanView" class="hidden">
+      <div class="kanban">
+        <div class="kanban-col">
+          <div class="kanban-header" style="color:var(--purple)">🟣 Prospects <span class="kanban-count" id="k-count-prospect">0</span></div>
+          <div id="k-prospect"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-header" style="color:var(--green)">🟢 Active <span class="kanban-count" id="k-count-active">0</span></div>
+          <div id="k-active"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-header" style="color:var(--cyan)">🔵 Completed <span class="kanban-count" id="k-count-completed">0</span></div>
+          <div id="k-completed"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-header" style="color:var(--orange)">🟠 Maintaining <span class="kanban-count" id="k-count-maintaining">0</span></div>
+          <div id="k-maintaining"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <h2 id="modalTitle">Add New Client</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Client Name *</label>
+        <input type="text" id="f-name" placeholder="Jane Smith" />
+      </div>
+      <div class="form-group">
+        <label>Business Name</label>
+        <input type="text" id="f-business" placeholder="Smith's Plumbing Co." />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="f-email" placeholder="jane@business.com" />
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" id="f-phone" placeholder="(215) 555-0100" />
+      </div>
+      <div class="form-group">
+        <label>Service Type</label>
+        <select id="f-service">
+          <option value="">Select service…</option>
+          <option>Business Website</option>
+          <option>AI Chatbot</option>
+          <option>Business Automation</option>
+          <option>AI Agent</option>
+          <option>Website + Chatbot</option>
+          <option>Full AI Package</option>
+          <option>Monthly Retainer</option>
+          <option>Multiple Services</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="f-status">
+          <option value="prospect">🟣 Prospect</option>
+          <option value="active">🟢 Active Project</option>
+          <option value="completed">🔵 Completed</option>
+          <option value="maintaining">🟠 Maintaining</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Project Value ($)</label>
+        <input type="text" id="f-value" placeholder="1500" />
+      </div>
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" id="f-date" />
+      </div>
+      <div class="form-group full">
+        <label>Notes</label>
+        <textarea id="f-notes" rows="3" placeholder="Project details, next steps, follow-up dates…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="importOverlay" onclick="if(event.target.id==='importOverlay')closeImportModal()">
+  <div class="modal-card" style="max-width:520px;">
+    <h2 style="margin-bottom:4px;">📥 Import Lead from Chatbot</h2>
+    <p style="font-size:0.82rem;color:#64748b;margin-bottom:14px;">Paste the JSON copied from the SmithDev Labs website chatbot confirmation card, then click <strong>Import</strong>.</p>
+    <div class="form-group full">
+      <label>Lead JSON</label>
+      <textarea id="import-json" rows="8" placeholder='Paste lead JSON here…\n{\n  "name": "John Smith",\n  "email": "john@example.com",\n  ...\n}' style="font-family:monospace;font-size:0.78rem;"></textarea>
+      <div id="import-error" style="color:#ef4444;font-size:0.78rem;margin-top:4px;display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeImportModal()">Cancel</button>
+      <button class="btn btn-primary" style="background:#16a34a;" onclick="importLead()">📥 Import Client</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const COLORS = ['#3b82f6','#a855f7','#22c55e','#f59e0b','#06b6d4','#f97316','#ec4899','#ef4444'];
+  let clients = JSON.parse(localStorage.getItem('sdl-clients') || '[]');
+  let editId = null;
+  let currentFilter = 'all';
+  let currentView = 'list';
+
+  function save() { localStorage.setItem('sdl-clients', JSON.stringify(clients)); updateStats(); }
+
+  function initials(name) { return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '??'; }
+  function colorFor(name) { let h=0; for(let c of name) h+=c.charCodeAt(0); return COLORS[h % COLORS.length]; }
+
+  function badgeHTML(status) {
+    const map = { prospect:'badge-prospect', active:'badge-active', completed:'badge-completed', maintaining:'badge-maintaining' };
+    const labels = { prospect:'Prospect', active:'Active', completed:'Completed', maintaining:'Maintaining' };
+    return `<span class="badge ${map[status]}">${labels[status]||status}</span>`;
+  }
+
+  function renderClients() {
+    const q = (document.getElementById('searchInput').value || '').toLowerCase();
+    const grid = document.getElementById('clientsGrid');
+    let list = clients.filter(c => currentFilter === 'all' || c.status === currentFilter);
+    if (q) list = list.filter(c => (c.name+c.business+c.service+c.notes).toLowerCase().includes(q));
+
+    if (!list.length) {
+      grid.innerHTML = `<div class="empty-state"><div>📂</div><p>No clients yet.<br>Click <strong>+ Add Client</strong> to get started.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = list.map(c => `
+      <div class="client-card" id="card-${c.id}" onclick="toggleCard('${c.id}')">
+        <div class="client-avatar" style="background:${colorFor(c.name)}">${initials(c.name)}</div>
+        <div class="client-info">
+          <div class="client-name">${c.name}</div>
+          <div class="client-meta">
+            ${c.business ? `<span>🏢 ${c.business}</span>` : ''}
+            ${c.service  ? `<span>🔧 ${c.service}</span>` : ''}
+            ${c.value    ? `<span>💰 $${Number(c.value).toLocaleString()}</span>` : ''}
+            ${c.date     ? `<span>📅 ${c.date}</span>` : ''}
+          </div>
+        </div>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          ${badgeHTML(c.status)}
+          <button class="btn btn-ghost btn-sm" onclick="scheduleEvent('${c.name.replace(/'/g,"\\'")}','${c.email||''}')">📅 Schedule</button>
+          <button class="btn btn-ghost btn-sm" onclick="openModal('${c.id}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">🗑️</button>
+        </div>
+        <div class="client-detail" style="grid-column:1/-1;" onclick="event.stopPropagation()">
+          <div class="detail-grid">
+            ${c.email ? `<div class="detail-field"><label>Email</label><p><a href="mailto:${c.email}" style="color:var(--primary)">${c.email}</a></p></div>` : ''}
+            ${c.phone ? `<div class="detail-field"><label>Phone</label><p>${c.phone}</p></div>` : ''}
+            ${c.service ? `<div class="detail-field"><label>Service</label><p>${c.service}</p></div>` : ''}
+          </div>
+          <div class="notes-block">
+            <label>Notes & Next Steps</label>
+            <textarea placeholder="Add notes…" onchange="updateNotes('${c.id}',this.value)">${c.notes||''}</textarea>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderKanban() {
+    const statuses = ['prospect','active','completed','maintaining'];
+    statuses.forEach(s => {
+      const list = clients.filter(c => c.status === s);
+      document.getElementById(`k-count-${s}`).textContent = list.length;
+      document.getElementById(`k-${s}`).innerHTML = list.length
+        ? list.map(c => `<div class="kanban-item" onclick="openModal('${c.id}')" style="border-left-color:${colorFor(c.name)}">
+            <div class="k-name">${c.name}</div>
+            <div class="k-service">${c.business||''}${c.service ? ' · '+c.service : ''}${c.value ? ' · $'+Number(c.value).toLocaleString() : ''}</div>
+          </div>`).join('')
+        : `<div style="color:var(--text-muted);font-size:.78rem;text-align:center;padding:12px;">Empty</div>`;
+    });
+  }
+
+  function toggleCard(id) {
+    const card = document.getElementById('card-'+id);
+    card.classList.toggle('expanded');
+  }
+
+  function updateNotes(id, val) {
+    const c = clients.find(x=>x.id===id);
+    if (c) { c.notes = val; save(); }
+  }
+
+  function updateStats() {
+    document.getElementById('s-total').textContent = clients.length;
+    document.getElementById('s-active').textContent = clients.filter(c=>c.status==='active').length;
+    document.getElementById('s-prospect').textContent = clients.filter(c=>c.status==='prospect').length;
+    document.getElementById('s-maintaining').textContent = clients.filter(c=>c.status==='maintaining').length;
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderClients();
+  }
+
+  function setSideFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    if (currentView==='list') renderClients(); else renderKanban();
+  }
+
+  function setView(v, btn) {
+    currentView = v;
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('listView').classList.add('hidden');
+    document.getElementById('kanbanView').classList.add('hidden');
+    document.getElementById('calendarView').classList.add('hidden');
+    document.getElementById('bookingsView').classList.add('hidden');
+    if (v === 'list') {
+      document.getElementById('listView').classList.remove('hidden');
+      renderClients();
+    } else if (v === 'kanban') {
+      document.getElementById('kanbanView').classList.remove('hidden');
+      renderKanban();
+    } else if (v === 'calendar') {
+      document.getElementById('calendarView').classList.remove('hidden');
+    } else if (v === 'bookings') {
+      document.getElementById('bookingsView').classList.remove('hidden');
+      renderBookings();
+    }
+  }
+
+  function getBookings() {
+    try { return JSON.parse(localStorage.getItem('sdl-bookings') || '[]'); } catch(e) { return []; }
+  }
+
+  function saveBookings(arr) {
+    try { localStorage.setItem('sdl-bookings', JSON.stringify(arr)); } catch(e) {}
+  }
+
+  function updateBookingsBadge() {
+    const b = getBookings().filter(b => !b.confirmed);
+    const el = document.getElementById('bookingsBadge');
+    if (b.length > 0) { el.style.display = 'inline'; el.textContent = b.length; }
+    else { el.style.display = 'none'; }
+  }
+
+  function renderBookings() {
+    const bookings = getBookings();
+    const grid = document.getElementById('bookingsGrid');
+    const empty = document.getElementById('bookingsEmpty');
+    grid.innerHTML = '';
+    if (!bookings.length) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    bookings.forEach((b, idx) => {
+      const card = document.createElement('div');
+      card.style.cssText = `background:white;border:1px solid #e2e8f0;border-radius:14px;padding:20px 22px;display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,0.05);${b.confirmed ? 'opacity:0.55;' : ''}`;
+      const statusBadge = b.confirmed
+        ? `<span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:50px;font-size:0.72rem;font-weight:700;">✅ Confirmed</span>`
+        : `<span style="background:#fef9c3;color:#92400e;padding:3px 10px;border-radius:50px;font-size:0.72rem;font-weight:700;">⏳ Pending</span>`;
+      const gcalURL = (() => {
+        const title   = encodeURIComponent(`Free AI Audit Call — SmithDev Labs × ${b.name}`);
+        const details = encodeURIComponent(`Booking from website.\n\nName: ${b.name}\nEmail: ${b.email}\nPhone: ${b.phone}\nBusiness: ${b.business||'N/A'}\nService: ${b.service}\nPreferred: ${b.day||''} at ${b.time||''} EST`);
+        const guests  = encodeURIComponent(b.email);
+        return `https://calendar.google.com/calendar/r/eventedit?text=${title}&details=${details}&add=${guests}&src=msmith%40smithdevlabs.com`;
+      })();
+      card.innerHTML = `
+        <div style="flex:1;min-width:220px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+            <strong style="font-size:1rem;color:#1e293b;">${b.name}</strong>
+            ${statusBadge}
+            <span style="font-size:0.75rem;color:#94a3b8;">${b.timestamp ? new Date(b.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : b.date}</span>
+          </div>
+          <div style="font-size:0.83rem;color:#475569;line-height:1.8;">
+            ${b.day && b.time ? `<strong>📅 Requested:</strong> ${b.day} at ${b.time} EST<br>` : ''}
+            <strong>📧</strong> ${b.email} &nbsp;·&nbsp; <strong>📞</strong> ${b.phone}<br>
+            ${b.business ? `<strong>🏢</strong> ${b.business}<br>` : ''}
+            ${b.service ? `<strong>🔧</strong> ${b.service}<br>` : ''}
+            ${b.notes ? `<span style="color:#64748b;font-size:0.78rem;">${b.notes}</span>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;min-width:170px;">
+          <a href="${gcalURL}" target="_blank" style="display:block;text-align:center;background:#1a73e8;color:white;padding:8px 12px;border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none;">📅 Add to Google Calendar</a>
+          ${!b.confirmed ? `<button type="button" onclick="confirmBookingCRM(${idx})" style="background:#16a34a;color:white;border:none;padding:8px 12px;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;">✅ Mark Confirmed</button>` : ''}
+          <button type="button" onclick="importBookingAsCRM(${idx})" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;padding:8px 12px;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;">➕ Add to Client List</button>
+          <button type="button" onclick="removeBooking(${idx})" style="background:#fef2f2;color:#ef4444;border:1px solid #fecaca;padding:6px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">🗑️ Remove</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function confirmBookingCRM(idx) {
+    const bookings = getBookings();
+    if (bookings[idx]) { bookings[idx].confirmed = true; saveBookings(bookings); updateBookingsBadge(); renderBookings(); }
+  }
+
+  function removeBooking(idx) {
+    const bookings = getBookings();
+    bookings.splice(idx, 1);
+    saveBookings(bookings);
+    updateBookingsBadge();
+    renderBookings();
+  }
+
+  function importBookingAsCRM(idx) {
+    const b = getBookings()[idx];
+    if (!b) return;
+    const exists = clients.some(c => c.email === b.email);
+    if (exists) { alert(`"${b.name}" is already in your client list.`); return; }
+    clients.unshift({
+      id: Date.now().toString(),
+      name: b.name, business: b.business || '', email: b.email,
+      phone: b.phone, service: b.service, status: 'Lead',
+      value: '', date: b.date || new Date().toISOString().split('T')[0],
+      notes: `Booked call: ${b.day||''} ${b.time||''} EST. ${b.notes||''}`
+    });
+    save();
+    setTimeout(() => alert(`✅ "${b.name}" added to your client list as a new Lead!`), 50);
+  }
+
+  function clearConfirmedBookings() {
+    const bookings = getBookings().filter(b => !b.confirmed);
+    saveBookings(bookings);
+    updateBookingsBadge();
+    renderBookings();
+  }
+
+  function scheduleEvent(clientName, clientEmail) {
+    const name  = clientName  || '';
+    const email = clientEmail || '';
+    const title = name ? `Discovery Call — ${name}` : 'New Client Meeting';
+    const details = name
+      ? `SmithDev Labs meeting with ${name}${email ? ' (' + email + ')' : ''}.`
+      : 'SmithDev Labs client meeting.';
+    const guests = email ? `&add=${encodeURIComponent(email)}` : '';
+    const url = `https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent(title)}&details=${encodeURIComponent(details)}&src=msmith%40smithdevlabs.com${guests}`;
+    window.open(url, '_blank');
+  }
+
+  function openModal(id) {
+    editId = id || null;
+    const modal = document.getElementById('modalOverlay');
+    document.getElementById('modalTitle').textContent = id ? 'Edit Client' : 'Add New Client';
+    if (id) {
+      const c = clients.find(x=>x.id===id);
+      if (c) {
+        document.getElementById('f-name').value    = c.name || '';
+        document.getElementById('f-business').value= c.business || '';
+        document.getElementById('f-email').value   = c.email || '';
+        document.getElementById('f-phone').value   = c.phone || '';
+        document.getElementById('f-service').value = c.service || '';
+        document.getElementById('f-status').value  = c.status || 'prospect';
+        document.getElementById('f-value').value   = c.value || '';
+        document.getElementById('f-date').value    = c.date || '';
+        document.getElementById('f-notes').value   = c.notes || '';
+      }
+    } else {
+      ['f-name','f-business','f-email','f-phone','f-value','f-date','f-notes'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('f-service').value = '';
+      document.getElementById('f-status').value  = 'prospect';
+      document.getElementById('f-date').value    = new Date().toISOString().split('T')[0];
+    }
+    modal.classList.remove('hidden');
+  }
+
+  function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); editId = null; }
+  function closeModalOutside(e) { if (e.target.id==='modalOverlay') closeModal(); }
+
+  function saveClient() {
+    const name = document.getElementById('f-name').value.trim();
+    if (!name) { alert('Client name is required.'); return; }
+    const data = {
+      id: editId || Date.now().toString(),
+      name,
+      business: document.getElementById('f-business').value.trim(),
+      email:    document.getElementById('f-email').value.trim(),
+      phone:    document.getElementById('f-phone').value.trim(),
+      service:  document.getElementById('f-service').value,
+      status:   document.getElementById('f-status').value,
+      value:    document.getElementById('f-value').value.trim(),
+      date:     document.getElementById('f-date').value,
+      notes:    document.getElementById('f-notes').value.trim(),
+    };
+    if (editId) {
+      const i = clients.findIndex(c=>c.id===editId);
+      if (i > -1) clients[i] = data;
+    } else {
+      clients.unshift(data);
+    }
+    save();
+    closeModal();
+    if (currentView==='list') renderClients(); else renderKanban();
+  }
+
+  function deleteClient(id) {
+    if (!confirm('Delete this client? This cannot be undone.')) return;
+    clients = clients.filter(c=>c.id!==id);
+    save();
+    if (currentView==='list') renderClients(); else renderKanban();
+  }
+
+  function exportCSV() {
+    if (!clients.length) { alert('No clients to export.'); return; }
+    const headers = ['Name','Business','Email','Phone','Service','Status','Value','Start Date','Notes'];
+    const rows = clients.map(c=>[c.name,c.business,c.email,c.phone,c.service,c.status,c.value,c.date,c.notes].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'SmithDevLabs_Clients_' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+  }
+
+  function openImportModal() {
+    document.getElementById('import-json').value = '';
+    document.getElementById('import-error').style.display = 'none';
+    document.getElementById('importOverlay').classList.remove('hidden');
+    setTimeout(() => document.getElementById('import-json').focus(), 100);
+  }
+
+  function closeImportModal() {
+    document.getElementById('importOverlay').classList.add('hidden');
+  }
+
+  function importLead() {
+    const raw = document.getElementById('import-json').value.trim();
+    const errEl = document.getElementById('import-error');
+    errEl.style.display = 'none';
+    if (!raw) { errEl.textContent = 'Please paste the JSON from the chatbot.'; errEl.style.display = 'block'; return; }
+    let data;
+    try { data = JSON.parse(raw); } catch(e) { errEl.textContent = 'Invalid JSON. Copy again from the chatbot confirmation card.'; errEl.style.display = 'block'; return; }
+    if (!data.name) { errEl.textContent = 'JSON is missing a "name" field.'; errEl.style.display = 'block'; return; }
+    const client = {
+      id: Date.now().toString(),
+      name: data.name || '',
+      business: data.business || '',
+      email: data.email || '',
+      phone: data.phone || '',
+      service: data.service || '',
+      status: data.status || 'Lead',
+      value: data.value || '',
+      date: data.date || new Date().toISOString().split('T')[0],
+      notes: data.notes || ''
+    };
+    clients.unshift(client);
+    save();
+    closeImportModal();
+    if (currentView === 'list') renderClients(); else renderKanban();
+    setTimeout(() => alert(`✅ "${client.name}" has been added to your CRM as a new lead!`), 100);
+  }
+
+  function autoImportPendingBookings() {
+    try {
+      const bookings = JSON.parse(localStorage.getItem('sdl-bookings') || '[]');
+      if (!bookings.length) return;
+      let added = 0;
+      bookings.forEach(b => {
+        if (!b.name || !b.email) return;
+        const alreadyClient = clients.some(c => c.email === b.email);
+        if (alreadyClient) return;
+        clients.unshift({
+          id: b.id || Date.now().toString() + Math.random(),
+          name: b.name,
+          business: b.business || '',
+          email: b.email,
+          phone: b.phone || '',
+          service: b.service || '',
+          status: 'Lead',
+          value: '',
+          date: b.date || new Date().toISOString().split('T')[0],
+          notes: `Booked call: ${b.day || ''} ${b.time || ''} EST. ${b.notes || ''}`.trim()
+        });
+        added++;
+      });
+      if (added > 0) {
+        save();
+        const banner = document.createElement('div');
+        banner.style.cssText = 'position:fixed;top:16px;right:16px;background:#22c55e;color:white;padding:12px 20px;border-radius:10px;font-size:0.85rem;font-weight:700;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        banner.textContent = `✅ ${added} new lead${added > 1 ? 's' : ''} auto-imported from booking form`;
+        document.body.appendChild(banner);
+        setTimeout(() => banner.remove(), 4000);
+      }
+    } catch(e) {}
+  }
+
+  renderClients();
+  updateStats();
+  updateBookingsBadge();
+  autoImportPendingBookings();
+</script>
+
+<div style="text-align:center;margin-top:32px;padding:16px;color:#64748b;font-size:.75rem;line-height:2;border-top:1px solid #e2e8f0;">
+  SmithDev Labs LLC &nbsp;·&nbsp; msmith@smithdevlabs.com &nbsp;·&nbsp; smithdevlabs.com
+  <br>
+  <span style="color:#2563eb;font-weight:600;">Business Hours: Mon–Fri &nbsp;9:00 AM – 5:00 PM EST</span>
+  &nbsp;·&nbsp; After hours? Email, text, or book an appointment via chatbot — we'll get back to you ASAP.
+</div>
+
+</body>
+</html>

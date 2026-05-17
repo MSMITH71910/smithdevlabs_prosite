@@ -613,6 +613,7 @@
     }
     setTimeout(() => openViaLink(ownerGmailURL), 300);
     setTimeout(() => openViaLink(clientGmailURL), 700);
+    setTimeout(() => openViaLink(window.location.href.replace(/\/[^/]*$/, '/crm.html')), 1100);
 
     document.querySelector('.booking-steps-nav').style.display = 'none';
     for (let i = 1; i <= 4; i++) document.getElementById('bs-' + i).classList.remove('active');
@@ -622,7 +623,7 @@
     document.getElementById('successActions').innerHTML = `
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;text-align:left;font-size:0.82rem;color:#166534;line-height:1.8;">
         <div>✅ <strong>Google Calendar</strong> event opened for you to save</div>
-        <div>✅ <strong>CRM</strong> — lead data auto-saved &amp; copied to clipboard</div>
+        <div>✅ <strong>CRM</strong> — lead auto-imported (opening now in new tab)</div>
         <div>✅ <strong>Your confirmation email</strong> is ready to send to ${lead.email}</div>
         <div>✅ <strong>Michael has been notified</strong> — he'll confirm within 2 hours</div>
       </div>
